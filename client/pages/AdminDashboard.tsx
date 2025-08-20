@@ -210,15 +210,48 @@ export default function AdminDashboard() {
   );
 
   // Blog management functions
-  const saveBlogPost = (post: BlogPost) => {
-    const updatedPosts = editingBlog
-      ? blogPosts.map(p => p.id === post.id ? { ...post, updated_at: new Date().toISOString() } : p)
-      : [...blogPosts, { ...post, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }];
+  const saveBlogPost = async (post: BlogPost) => {
+    try {
+      if (editingBlog) {
+        // Update existing post
+        const response = await fetch(`/api/blogs/${post.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(post),
+        });
 
-    setBlogPosts(updatedPosts);
-    localStorage.setItem('ascosemi_blog_posts', JSON.stringify(updatedPosts));
-    setShowBlogEditor(false);
-    setEditingBlog(null);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            setBlogPosts(prev => prev.map(p => p.id === post.id ? result.data : p));
+          }
+        }
+      } else {
+        // Create new post
+        const response = await fetch('/api/blogs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(post),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            setBlogPosts(prev => [...prev, result.data]);
+          }
+        }
+      }
+
+      setShowBlogEditor(false);
+      setEditingBlog(null);
+    } catch (error) {
+      console.error('Error saving blog post:', error);
+      alert('Error saving blog post. Please try again.');
+    }
   };
 
   const deleteBlogPost = (id: string) => {
