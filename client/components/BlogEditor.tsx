@@ -394,6 +394,13 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
                         src={formData.image}
                         alt="Featured"
                         className="w-full h-32 object-cover rounded-lg"
+                        onError={(e) => {
+                          console.error('Image failed to load:', formData.image);
+                          e.currentTarget.style.display = 'none';
+                        }}
+                        onLoad={() => {
+                          console.log('Image loaded successfully:', formData.image);
+                        }}
                       />
                       <Button
                         type="button"
