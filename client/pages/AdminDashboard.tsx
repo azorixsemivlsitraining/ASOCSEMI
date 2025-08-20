@@ -1308,6 +1308,22 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* Blog Editor Modal */}
+      {showBlogEditor && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-background border border-border-subtle rounded-xl w-full h-full max-w-none max-h-none overflow-y-auto">
+            <BlogEditor
+              post={editingBlog || undefined}
+              onSave={saveBlogPost}
+              onCancel={() => {
+                setShowBlogEditor(false);
+                setEditingBlog(null);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
