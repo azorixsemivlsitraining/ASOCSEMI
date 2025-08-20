@@ -11,6 +11,10 @@ import {
   ExternalLink,
   X,
   Lock,
+  Edit,
+  Plus,
+  Trash2,
+  BookOpen,
 } from "lucide-react";
 import Header from "../components/Header";
 import { useAuth } from "../contexts/AuthContext";
