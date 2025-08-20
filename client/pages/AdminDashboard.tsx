@@ -572,6 +572,16 @@ export default function AdminDashboard() {
               >
                 Resumes ({resumeUploads.length})
               </button>
+              <button
+                onClick={() => setActiveTab("blogs")}
+                className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
+                  activeTab === "blogs"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground/70 hover:text-foreground"
+                }`}
+              >
+                Blog Posts ({blogPosts.length})
+              </button>
             </div>
           </div>
 
