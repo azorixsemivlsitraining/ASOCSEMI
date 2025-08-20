@@ -320,6 +320,8 @@ export default function AdminDashboard() {
         return { data: filteredContacts, filename: 'contact_messages' };
       case 'resumes':
         return { data: filteredResumeUploads, filename: 'resume_uploads' };
+      case 'blogs':
+        return { data: filteredBlogPosts, filename: 'blog_posts' };
       default:
         return { data: [], filename: 'export' };
     }
