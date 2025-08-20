@@ -1,16 +1,16 @@
 import { useState, useRef } from "react";
-import { 
-  Save, 
-  Upload, 
-  X, 
-  Eye, 
-  EyeOff, 
-  Bold, 
-  Italic, 
-  List, 
+import {
+  Save,
+  Upload,
+  X,
+  Eye,
+  EyeOff,
+  Bold,
+  Italic,
+  List,
   Link,
   Image as ImageIcon,
-  Type
+  Type,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -36,19 +36,23 @@ interface BlogEditorProps {
   onCancel: () => void;
 }
 
-export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) {
+export default function BlogEditor({
+  post,
+  onSave,
+  onCancel,
+}: BlogEditorProps) {
   const [formData, setFormData] = useState<BlogPost>({
     title: "",
     excerpt: "",
     content: "",
     author: "ASCOSEMI Team",
-    publishDate: new Date().toISOString().split('T')[0],
+    publishDate: new Date().toISOString().split("T")[0],
     readTime: "5 min read",
     image: "",
     tags: [],
     featured: false,
     published: false,
-    ...post
+    ...post,
   });
 
   const [newTag, setNewTag] = useState("");
@@ -58,7 +62,7 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim() || !formData.content.trim()) {
       alert("Please fill in all required fields");
       return;
@@ -68,12 +72,14 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
     const wordsPerMinute = 200;
     const wordCount = formData.content.split(/\s+/).length;
     const readTimeMinutes = Math.ceil(wordCount / wordsPerMinute);
-    
+
     const finalPost = {
       ...formData,
       id: formData.id || Date.now().toString(),
       readTime: `${readTimeMinutes} min read`,
-      publishDate: formData.published ? formData.publishDate : new Date().toISOString().split('T')[0]
+      publishDate: formData.published
+        ? formData.publishDate
+        : new Date().toISOString().split("T")[0],
     };
 
     onSave(finalPost);
@@ -81,18 +87,18 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
 
   const handleAddTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        tags: [...prev.tags, newTag.trim()]
+        tags: [...prev.tags, newTag.trim()],
       }));
       setNewTag("");
     }
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }));
   };
 
@@ -101,14 +107,14 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
     if (!file) return;
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file");
       return;
     }
 
     // Validate file size (5MB limit)
     if (file.size > 5 * 1024 * 1024) {
-      alert('Image size must be less than 5MB');
+      alert("Image size must be less than 5MB");
       return;
     }
 
@@ -116,10 +122,10 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
 
     try {
       const formDataUpload = new FormData();
-      formDataUpload.append('image', file);
+      formDataUpload.append("image", file);
 
-      const response = await fetch('/api/upload/image', {
-        method: 'POST',
+      const response = await fetch("/api/upload/image", {
+        method: "POST",
         body: formDataUpload,
       });
 
@@ -130,36 +136,41 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
       const result = await response.json();
 
       if (result.success) {
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-          image: result.data.url
+          image: result.data.url,
         }));
-        console.log('Image uploaded successfully:', result.data.url);
+        console.log("Image uploaded successfully:", result.data.url);
       } else {
-        throw new Error(result.error || 'Upload failed');
+        throw new Error(result.error || "Upload failed");
       }
     } catch (error) {
       console.error("Error uploading image:", error);
-      alert(`Error uploading image: ${error instanceof Error ? error.message : 'Please try again.'}`);
+      alert(
+        `Error uploading image: ${error instanceof Error ? error.message : "Please try again."}`,
+      );
     } finally {
       setImageUploading(false);
       // Reset file input
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
     }
   };
 
   const insertTextAtCursor = (text: string) => {
-    const textarea = document.getElementById('content-editor') as HTMLTextAreaElement;
+    const textarea = document.getElementById(
+      "content-editor",
+    ) as HTMLTextAreaElement;
     if (textarea) {
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
       const content = formData.content;
-      const newContent = content.substring(0, start) + text + content.substring(end);
-      
-      setFormData(prev => ({ ...prev, content: newContent }));
-      
+      const newContent =
+        content.substring(0, start) + text + content.substring(end);
+
+      setFormData((prev) => ({ ...prev, content: newContent }));
+
       // Reset cursor position
       setTimeout(() => {
         textarea.focus();
@@ -180,7 +191,11 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
             variant="outline"
             onClick={() => setIsPreview(!isPreview)}
           >
-            {isPreview ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
+            {isPreview ? (
+              <EyeOff className="w-4 h-4 mr-2" />
+            ) : (
+              <Eye className="w-4 h-4 mr-2" />
+            )}
             {isPreview ? "Edit Mode" : "Preview"}
           </Button>
           <Button type="button" variant="outline" onClick={onCancel}>
@@ -198,8 +213,11 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
                 alt={formData.title}
                 className="w-full h-64 object-cover rounded-lg mb-6"
                 onError={(e) => {
-                  console.error('Preview image failed to load:', formData.image);
-                  e.currentTarget.style.display = 'none';
+                  console.error(
+                    "Preview image failed to load:",
+                    formData.image,
+                  );
+                  e.currentTarget.style.display = "none";
                 }}
               />
             )}
@@ -247,7 +265,12 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
                     <input
                       type="text"
                       value={formData.title}
-                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          title: e.target.value,
+                        }))
+                      }
                       className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
                       placeholder="Enter blog post title..."
                       required
@@ -260,7 +283,12 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
                     </label>
                     <textarea
                       value={formData.excerpt}
-                      onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          excerpt: e.target.value,
+                        }))
+                      }
                       className="w-full p-3 border border-border rounded-lg bg-background text-foreground h-20"
                       placeholder="Brief description of the post..."
                     />
@@ -270,7 +298,7 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
                     <label className="block text-sm font-medium text-foreground mb-2">
                       Content *
                     </label>
-                    
+
                     {/* Formatting Toolbar */}
                     <div className="border border-border rounded-t-lg p-2 bg-muted/50 flex gap-2">
                       <button
@@ -307,18 +335,25 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
                       </button>
                       <button
                         type="button"
-                        onClick={() => insertTextAtCursor("[Link Text](https://example.com)")}
+                        onClick={() =>
+                          insertTextAtCursor("[Link Text](https://example.com)")
+                        }
                         className="p-2 hover:bg-background rounded"
                         title="Link"
                       >
                         <Link className="w-4 h-4" />
                       </button>
                     </div>
-                    
+
                     <textarea
                       id="content-editor"
                       value={formData.content}
-                      onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          content: e.target.value,
+                        }))
+                      }
                       className="w-full p-3 border border-border border-t-0 rounded-b-lg bg-background text-foreground h-96 font-mono text-sm"
                       placeholder="Write your blog post content here... You can use Markdown formatting."
                       required
@@ -342,7 +377,12 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
                     <input
                       type="text"
                       value={formData.author}
-                      onChange={(e) => setFormData(prev => ({ ...prev, author: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          author: e.target.value,
+                        }))
+                      }
                       className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
                     />
                   </div>
@@ -354,7 +394,12 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
                     <input
                       type="date"
                       value={formData.publishDate}
-                      onChange={(e) => setFormData(prev => ({ ...prev, publishDate: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          publishDate: e.target.value,
+                        }))
+                      }
                       className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
                     />
                   </div>
@@ -364,10 +409,18 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
                       type="checkbox"
                       id="featured"
                       checked={formData.featured}
-                      onChange={(e) => setFormData(prev => ({ ...prev, featured: e.target.checked }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          featured: e.target.checked,
+                        }))
+                      }
                       className="rounded"
                     />
-                    <label htmlFor="featured" className="text-sm font-medium text-foreground">
+                    <label
+                      htmlFor="featured"
+                      className="text-sm font-medium text-foreground"
+                    >
                       Featured Post
                     </label>
                   </div>
@@ -377,10 +430,18 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
                       type="checkbox"
                       id="published"
                       checked={formData.published}
-                      onChange={(e) => setFormData(prev => ({ ...prev, published: e.target.checked }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          published: e.target.checked,
+                        }))
+                      }
                       className="rounded"
                     />
-                    <label htmlFor="published" className="text-sm font-medium text-foreground">
+                    <label
+                      htmlFor="published"
+                      className="text-sm font-medium text-foreground"
+                    >
                       Publish immediately
                     </label>
                   </div>
@@ -399,18 +460,26 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
                         alt="Featured"
                         className="w-full h-32 object-cover rounded-lg"
                         onError={(e) => {
-                          console.error('Image failed to load:', formData.image);
-                          e.currentTarget.style.display = 'none';
+                          console.error(
+                            "Image failed to load:",
+                            formData.image,
+                          );
+                          e.currentTarget.style.display = "none";
                         }}
                         onLoad={() => {
-                          console.log('Image loaded successfully:', formData.image);
+                          console.log(
+                            "Image loaded successfully:",
+                            formData.image,
+                          );
                         }}
                       />
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => setFormData(prev => ({ ...prev, image: "" }))}
+                        onClick={() =>
+                          setFormData((prev) => ({ ...prev, image: "" }))
+                        }
                         className="w-full"
                       >
                         Remove Image
@@ -450,7 +519,10 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
                       type="text"
                       value={newTag}
                       onChange={(e) => setNewTag(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+                      onKeyPress={(e) =>
+                        e.key === "Enter" &&
+                        (e.preventDefault(), handleAddTag())
+                      }
                       className="flex-1 p-2 border border-border rounded-lg bg-background text-foreground text-sm"
                       placeholder="Add tag..."
                     />
@@ -458,10 +530,14 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
                       Add
                     </Button>
                   </div>
-                  
+
                   <div className="flex flex-wrap gap-2">
                     {formData.tags.map((tag, index) => (
-                      <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="flex items-center gap-1"
+                      >
                         {tag}
                         <X
                           className="w-3 h-3 cursor-pointer hover:text-red-500"

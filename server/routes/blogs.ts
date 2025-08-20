@@ -21,7 +21,8 @@ let blogPosts: BlogPost[] = [
   {
     id: "1",
     title: "The Future of VLSI Design and Semiconductor Technology",
-    excerpt: "Exploring the latest trends and innovations shaping the semiconductor industry and VLSI design methodologies.",
+    excerpt:
+      "Exploring the latest trends and innovations shaping the semiconductor industry and VLSI design methodologies.",
     content: `# The Future of VLSI Design and Semiconductor Technology
 
 The semiconductor industry continues to evolve at an unprecedented pace, driving innovations that shape our digital world. As we look toward the future, several key trends are emerging that will define the next generation of VLSI design and semiconductor technology.
@@ -90,17 +91,19 @@ At ASCOSEMI, we are committed to staying at the forefront of these developments,
     author: "ASCOSEMI Technical Team",
     publishDate: "2024-12-20",
     readTime: "8 min read",
-    image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    image:
+      "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     tags: ["VLSI", "Semiconductor", "Technology", "Future Trends"],
     featured: true,
     published: true,
     created_at: "2024-12-20T10:00:00.000Z",
-    updated_at: "2024-12-20T10:00:00.000Z"
+    updated_at: "2024-12-20T10:00:00.000Z",
   },
   {
     id: "2",
     title: "Advanced Circuit Design Techniques for Modern Applications",
-    excerpt: "Deep dive into modern circuit design methodologies and best practices for optimal performance in today's applications.",
+    excerpt:
+      "Deep dive into modern circuit design methodologies and best practices for optimal performance in today's applications.",
     content: `# Advanced Circuit Design Techniques for Modern Applications
 
 Modern circuit design has evolved significantly with the advent of new technologies and methodologies. This comprehensive guide explores advanced techniques that enable engineers to create high-performance, efficient designs for today's demanding applications.
@@ -193,56 +196,58 @@ Our team at ASCOSEMI specializes in implementing these advanced techniques to de
     author: "ASCOSEMI Design Team",
     publishDate: "2024-12-18",
     readTime: "10 min read",
-    image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    image:
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     tags: ["Circuit Design", "Engineering", "Low Power", "High Speed"],
     featured: false,
     published: true,
     created_at: "2024-12-18T10:00:00.000Z",
-    updated_at: "2024-12-18T10:00:00.000Z"
-  }
+    updated_at: "2024-12-18T10:00:00.000Z",
+  },
 ];
 
 // Get all blog posts
 export const getAllBlogs: RequestHandler = (req, res) => {
   try {
     const { published, featured, limit } = req.query;
-    
+
     let filteredPosts = [...blogPosts];
-    
+
     // Filter by published status
     if (published !== undefined) {
-      filteredPosts = filteredPosts.filter(post => 
-        post.published === (published === 'true')
+      filteredPosts = filteredPosts.filter(
+        (post) => post.published === (published === "true"),
       );
     }
-    
+
     // Filter by featured status
     if (featured !== undefined) {
-      filteredPosts = filteredPosts.filter(post => 
-        post.featured === (featured === 'true')
+      filteredPosts = filteredPosts.filter(
+        (post) => post.featured === (featured === "true"),
       );
     }
-    
+
     // Sort by created date (newest first)
-    filteredPosts.sort((a, b) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    filteredPosts.sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
-    
+
     // Apply limit if specified
     if (limit && !isNaN(Number(limit))) {
       filteredPosts = filteredPosts.slice(0, Number(limit));
     }
-    
+
     res.json({
       success: true,
       data: filteredPosts,
-      total: filteredPosts.length
+      total: filteredPosts.length,
     });
   } catch (error) {
-    console.error('Error fetching blog posts:', error);
+    console.error("Error fetching blog posts:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch blog posts'
+      error: "Failed to fetch blog posts",
     });
   }
 };
@@ -251,24 +256,24 @@ export const getAllBlogs: RequestHandler = (req, res) => {
 export const getBlogById: RequestHandler = (req, res) => {
   try {
     const { id } = req.params;
-    const post = blogPosts.find(p => p.id === id);
-    
+    const post = blogPosts.find((p) => p.id === id);
+
     if (!post) {
       return res.status(404).json({
         success: false,
-        error: 'Blog post not found'
+        error: "Blog post not found",
       });
     }
-    
+
     res.json({
       success: true,
-      data: post
+      data: post,
     });
   } catch (error) {
-    console.error('Error fetching blog post:', error);
+    console.error("Error fetching blog post:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch blog post'
+      error: "Failed to fetch blog post",
     });
   }
 };
@@ -286,44 +291,44 @@ export const createBlog: RequestHandler = (req, res) => {
       image,
       tags,
       featured,
-      published
+      published,
     } = req.body;
-    
+
     // Validate required fields
     if (!title || !content || !author) {
       return res.status(400).json({
         success: false,
-        error: 'Missing required fields: title, content, author'
+        error: "Missing required fields: title, content, author",
       });
     }
-    
+
     const newPost: BlogPost = {
       id: Date.now().toString(),
       title,
-      excerpt: excerpt || '',
+      excerpt: excerpt || "",
       content,
       author,
-      publishDate: publishDate || new Date().toISOString().split('T')[0],
+      publishDate: publishDate || new Date().toISOString().split("T")[0],
       readTime: readTime || calculateReadTime(content),
-      image: image || '',
+      image: image || "",
       tags: tags || [],
       featured: featured || false,
       published: published || false,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
-    
+
     blogPosts.push(newPost);
-    
+
     res.status(201).json({
       success: true,
-      data: newPost
+      data: newPost,
     });
   } catch (error) {
-    console.error('Error creating blog post:', error);
+    console.error("Error creating blog post:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to create blog post'
+      error: "Failed to create blog post",
     });
   }
 };
@@ -332,15 +337,15 @@ export const createBlog: RequestHandler = (req, res) => {
 export const updateBlog: RequestHandler = (req, res) => {
   try {
     const { id } = req.params;
-    const postIndex = blogPosts.findIndex(p => p.id === id);
-    
+    const postIndex = blogPosts.findIndex((p) => p.id === id);
+
     if (postIndex === -1) {
       return res.status(404).json({
         success: false,
-        error: 'Blog post not found'
+        error: "Blog post not found",
       });
     }
-    
+
     const {
       title,
       excerpt,
@@ -351,43 +356,45 @@ export const updateBlog: RequestHandler = (req, res) => {
       image,
       tags,
       featured,
-      published
+      published,
     } = req.body;
-    
+
     // Validate required fields
     if (!title || !content || !author) {
       return res.status(400).json({
         success: false,
-        error: 'Missing required fields: title, content, author'
+        error: "Missing required fields: title, content, author",
       });
     }
-    
+
     const updatedPost: BlogPost = {
       ...blogPosts[postIndex],
       title,
-      excerpt: excerpt || '',
+      excerpt: excerpt || "",
       content,
       author,
       publishDate: publishDate || blogPosts[postIndex].publishDate,
       readTime: readTime || calculateReadTime(content),
-      image: image || '',
+      image: image || "",
       tags: tags || [],
-      featured: featured !== undefined ? featured : blogPosts[postIndex].featured,
-      published: published !== undefined ? published : blogPosts[postIndex].published,
-      updated_at: new Date().toISOString()
+      featured:
+        featured !== undefined ? featured : blogPosts[postIndex].featured,
+      published:
+        published !== undefined ? published : blogPosts[postIndex].published,
+      updated_at: new Date().toISOString(),
     };
-    
+
     blogPosts[postIndex] = updatedPost;
-    
+
     res.json({
       success: true,
-      data: updatedPost
+      data: updatedPost,
     });
   } catch (error) {
-    console.error('Error updating blog post:', error);
+    console.error("Error updating blog post:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to update blog post'
+      error: "Failed to update blog post",
     });
   }
 };
@@ -396,26 +403,26 @@ export const updateBlog: RequestHandler = (req, res) => {
 export const deleteBlog: RequestHandler = (req, res) => {
   try {
     const { id } = req.params;
-    const postIndex = blogPosts.findIndex(p => p.id === id);
-    
+    const postIndex = blogPosts.findIndex((p) => p.id === id);
+
     if (postIndex === -1) {
       return res.status(404).json({
         success: false,
-        error: 'Blog post not found'
+        error: "Blog post not found",
       });
     }
-    
+
     const deletedPost = blogPosts.splice(postIndex, 1)[0];
-    
+
     res.json({
       success: true,
-      data: deletedPost
+      data: deletedPost,
     });
   } catch (error) {
-    console.error('Error deleting blog post:', error);
+    console.error("Error deleting blog post:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to delete blog post'
+      error: "Failed to delete blog post",
     });
   }
 };
@@ -425,39 +432,40 @@ export const getBlogsByTag: RequestHandler = (req, res) => {
   try {
     const { tag } = req.params;
     const { published, limit } = req.query;
-    
-    let filteredPosts = blogPosts.filter(post => 
-      post.tags.some(t => t.toLowerCase() === tag.toLowerCase())
+
+    let filteredPosts = blogPosts.filter((post) =>
+      post.tags.some((t) => t.toLowerCase() === tag.toLowerCase()),
     );
-    
+
     // Filter by published status
     if (published !== undefined) {
-      filteredPosts = filteredPosts.filter(post => 
-        post.published === (published === 'true')
+      filteredPosts = filteredPosts.filter(
+        (post) => post.published === (published === "true"),
       );
     }
-    
+
     // Sort by created date (newest first)
-    filteredPosts.sort((a, b) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    filteredPosts.sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
-    
+
     // Apply limit if specified
     if (limit && !isNaN(Number(limit))) {
       filteredPosts = filteredPosts.slice(0, Number(limit));
     }
-    
+
     res.json({
       success: true,
       data: filteredPosts,
       total: filteredPosts.length,
-      tag
+      tag,
     });
   } catch (error) {
-    console.error('Error fetching blog posts by tag:', error);
+    console.error("Error fetching blog posts by tag:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch blog posts by tag'
+      error: "Failed to fetch blog posts by tag",
     });
   }
 };

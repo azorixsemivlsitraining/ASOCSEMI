@@ -8,7 +8,7 @@ import {
   createBlog,
   updateBlog,
   deleteBlog,
-  getBlogsByTag
+  getBlogsByTag,
 } from "./routes/blogs";
 import { uploadImage, deleteImage, uploadMiddleware } from "./routes/upload";
 

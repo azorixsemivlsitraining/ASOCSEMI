@@ -29,7 +29,7 @@ export default function Blogs() {
 
   const fetchBlogPosts = async () => {
     try {
-      const response = await fetch('/api/blogs?published=true');
+      const response = await fetch("/api/blogs?published=true");
       const result = await response.json();
 
       if (result.success) {
@@ -44,8 +44,8 @@ export default function Blogs() {
     }
   };
 
-  const featuredPost = blogPosts.find(post => post.featured);
-  const regularPosts = blogPosts.filter(post => !post.featured);
+  const featuredPost = blogPosts.find((post) => post.featured);
+  const regularPosts = blogPosts.filter((post) => !post.featured);
 
   if (loading) {
     return (
@@ -69,7 +69,7 @@ export default function Blogs() {
               Our <span className="text-gradient">Blog</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Stay updated with the latest insights, innovations, and trends in 
+              Stay updated with the latest insights, innovations, and trends in
               semiconductor technology and VLSI design.
             </p>
           </div>
@@ -80,7 +80,9 @@ export default function Blogs() {
       {featuredPost && (
         <section className="py-16">
           <div className="container mx-auto px-4 lg:px-8">
-            <h2 className="text-3xl font-bold text-foreground mb-8">Featured Post</h2>
+            <h2 className="text-3xl font-bold text-foreground mb-8">
+              Featured Post
+            </h2>
             <Card className="overflow-hidden card-hover">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                 <div className="relative h-64 lg:h-full">
@@ -135,7 +137,9 @@ export default function Blogs() {
       {/* Blog Posts Grid */}
       <section className="py-16">
         <div className="container mx-auto px-4 lg:px-8">
-          <h2 className="text-3xl font-bold text-foreground mb-8">Latest Posts</h2>
+          <h2 className="text-3xl font-bold text-foreground mb-8">
+            Latest Posts
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {regularPosts.map((post) => (
               <Card key={post.id} className="overflow-hidden card-hover group">
@@ -162,9 +166,7 @@ export default function Blogs() {
                   </h3>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-muted-foreground mb-4">
-                    {post.excerpt}
-                  </p>
+                  <p className="text-muted-foreground mb-4">{post.excerpt}</p>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {post.tags.map((tag, index) => (
                       <Badge key={index} variant="outline" className="text-xs">
@@ -197,7 +199,7 @@ export default function Blogs() {
               Stay Updated
             </h2>
             <p className="text-muted-foreground mb-8">
-              Subscribe to our newsletter to get the latest insights and updates 
+              Subscribe to our newsletter to get the latest insights and updates
               from the world of semiconductor technology.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
@@ -206,9 +208,7 @@ export default function Blogs() {
                 placeholder="Enter your email"
                 className="flex-1 px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tech-blue"
               />
-              <Button className="px-8">
-                Subscribe
-              </Button>
+              <Button className="px-8">Subscribe</Button>
             </div>
           </div>
         </div>

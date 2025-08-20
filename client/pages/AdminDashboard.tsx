@@ -20,7 +20,7 @@ import Header from "../components/Header";
 import BlogEditor from "../components/BlogEditor";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../lib/supabase";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 interface Application {
   id: string;
@@ -44,7 +44,6 @@ interface Contact {
   message: string;
   created_at: string;
 }
-
 
 interface ResumeUpload {
   id: string;
@@ -80,14 +79,18 @@ export default function AdminDashboard() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [resumeUploads, setResumeUploads] = useState<ResumeUpload[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
-  const [activeTab, setActiveTab] = useState<"applications" | "contacts" | "resumes" | "blogs">(
-    "applications",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "applications" | "contacts" | "resumes" | "blogs"
+  >("applications");
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [selectedItem, setSelectedItem] = useState<Application | Contact | ResumeUpload | BlogPost | null>(null);
-  const [modalType, setModalType] = useState<"application" | "contact" | "resume" | "blog" | null>(null);
+  const [selectedItem, setSelectedItem] = useState<
+    Application | Contact | ResumeUpload | BlogPost | null
+  >(null);
+  const [modalType, setModalType] = useState<
+    "application" | "contact" | "resume" | "blog" | null
+  >(null);
   const [showBlogEditor, setShowBlogEditor] = useState(false);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
 
@@ -133,21 +136,23 @@ export default function AdminDashboard() {
       if (contactsError) throw contactsError;
       setContacts(contactsData || []);
 
-
       // Fetch resume uploads (from job applications with resume URLs)
-      const resumeData = applicationsData?.filter(app => app.resume_url).map(app => ({
-        id: app.id,
-        file_name: `Resume_${app.full_name.replace(/\s+/g, '_')}.pdf`,
-        file_url: app.resume_url,
-        uploaded_at: app.created_at,
-        applicant_name: app.full_name,
-        position: app.position,
-      })) || [];
+      const resumeData =
+        applicationsData
+          ?.filter((app) => app.resume_url)
+          .map((app) => ({
+            id: app.id,
+            file_name: `Resume_${app.full_name.replace(/\s+/g, "_")}.pdf`,
+            file_url: app.resume_url,
+            uploaded_at: app.created_at,
+            applicant_name: app.full_name,
+            position: app.position,
+          })) || [];
 
       setResumeUploads(resumeData);
 
       // Fetch blog posts from API
-      const blogsResponse = await fetch('/api/blogs');
+      const blogsResponse = await fetch("/api/blogs");
       if (blogsResponse.ok) {
         const blogsResult = await blogsResponse.json();
         if (blogsResult.success) {
@@ -194,19 +199,18 @@ export default function AdminDashboard() {
       contact.company?.toLowerCase().includes(filter.toLowerCase()),
   );
 
-
   const filteredResumeUploads = resumeUploads.filter(
     (resume) =>
       resume.file_name.toLowerCase().includes(filter.toLowerCase()) ||
       resume.applicant_name?.toLowerCase().includes(filter.toLowerCase()) ||
-      resume.position?.toLowerCase().includes(filter.toLowerCase())
+      resume.position?.toLowerCase().includes(filter.toLowerCase()),
   );
 
   const filteredBlogPosts = blogPosts.filter(
     (post) =>
       post.title.toLowerCase().includes(filter.toLowerCase()) ||
       post.author.toLowerCase().includes(filter.toLowerCase()) ||
-      post.tags.some(tag => tag.toLowerCase().includes(filter.toLowerCase()))
+      post.tags.some((tag) => tag.toLowerCase().includes(filter.toLowerCase())),
   );
 
   // Blog management functions
@@ -215,9 +219,9 @@ export default function AdminDashboard() {
       if (editingBlog) {
         // Update existing post
         const response = await fetch(`/api/blogs/${post.id}`, {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(post),
         });
@@ -225,15 +229,17 @@ export default function AdminDashboard() {
         if (response.ok) {
           const result = await response.json();
           if (result.success) {
-            setBlogPosts(prev => prev.map(p => p.id === post.id ? result.data : p));
+            setBlogPosts((prev) =>
+              prev.map((p) => (p.id === post.id ? result.data : p)),
+            );
           }
         }
       } else {
         // Create new post
-        const response = await fetch('/api/blogs', {
-          method: 'POST',
+        const response = await fetch("/api/blogs", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(post),
         });
@@ -241,7 +247,7 @@ export default function AdminDashboard() {
         if (response.ok) {
           const result = await response.json();
           if (result.success) {
-            setBlogPosts(prev => [...prev, result.data]);
+            setBlogPosts((prev) => [...prev, result.data]);
           }
         }
       }
@@ -249,27 +255,27 @@ export default function AdminDashboard() {
       setShowBlogEditor(false);
       setEditingBlog(null);
     } catch (error) {
-      console.error('Error saving blog post:', error);
-      alert('Error saving blog post. Please try again.');
+      console.error("Error saving blog post:", error);
+      alert("Error saving blog post. Please try again.");
     }
   };
 
   const deleteBlogPost = async (id: string) => {
-    if (confirm('Are you sure you want to delete this blog post?')) {
+    if (confirm("Are you sure you want to delete this blog post?")) {
       try {
         const response = await fetch(`/api/blogs/${id}`, {
-          method: 'DELETE',
+          method: "DELETE",
         });
 
         if (response.ok) {
           const result = await response.json();
           if (result.success) {
-            setBlogPosts(prev => prev.filter(p => p.id !== id));
+            setBlogPosts((prev) => prev.filter((p) => p.id !== id));
           }
         }
       } catch (error) {
-        console.error('Error deleting blog post:', error);
-        alert('Error deleting blog post. Please try again.');
+        console.error("Error deleting blog post:", error);
+        alert("Error deleting blog post. Please try again.");
       }
     }
   };
@@ -290,23 +296,28 @@ export default function AdminDashboard() {
 
     const headers = Object.keys(data[0]);
     const csvContent = [
-      headers.join(','),
-      ...data.map(row =>
-        headers.map(header => {
-          const value = row[header];
-          // Escape commas and quotes
-          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-            return `"${value.replace(/"/g, '""')}"`;
-          }
-          return value;
-        }).join(',')
-      )
-    ].join('\n');
+      headers.join(","),
+      ...data.map((row) =>
+        headers
+          .map((header) => {
+            const value = row[header];
+            // Escape commas and quotes
+            if (
+              typeof value === "string" &&
+              (value.includes(",") || value.includes('"'))
+            ) {
+              return `"${value.replace(/"/g, '""')}"`;
+            }
+            return value;
+          })
+          .join(","),
+      ),
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `${filename}_${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
   };
 
@@ -315,10 +326,10 @@ export default function AdminDashboard() {
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
 
     // Auto-size columns
-    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:A1');
+    const range = XLSX.utils.decode_range(worksheet["!ref"] || "A1:A1");
     const columnWidths: any[] = [];
     for (let C = range.s.c; C <= range.e.c; C++) {
       let maxWidth = 10;
@@ -332,9 +343,12 @@ export default function AdminDashboard() {
       }
       columnWidths.push({ wch: Math.min(maxWidth + 2, 50) });
     }
-    worksheet['!cols'] = columnWidths;
+    worksheet["!cols"] = columnWidths;
 
-    XLSX.writeFile(workbook, `${filename}_${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.writeFile(
+      workbook,
+      `${filename}_${new Date().toISOString().split("T")[0]}.xlsx`,
+    );
   };
 
   const exportAllToExcel = () => {
@@ -343,40 +357,50 @@ export default function AdminDashboard() {
     // Job Applications Sheet
     if (filteredApplications.length > 0) {
       const applicationsSheet = XLSX.utils.json_to_sheet(filteredApplications);
-      XLSX.utils.book_append_sheet(workbook, applicationsSheet, 'Job Applications');
+      XLSX.utils.book_append_sheet(
+        workbook,
+        applicationsSheet,
+        "Job Applications",
+      );
     }
 
     // Contact Messages Sheet
     if (filteredContacts.length > 0) {
       const contactsSheet = XLSX.utils.json_to_sheet(filteredContacts);
-      XLSX.utils.book_append_sheet(workbook, contactsSheet, 'Contact Messages');
+      XLSX.utils.book_append_sheet(workbook, contactsSheet, "Contact Messages");
     }
 
     // Resume Uploads Sheet
     if (filteredResumeUploads.length > 0) {
       const resumesSheet = XLSX.utils.json_to_sheet(filteredResumeUploads);
-      XLSX.utils.book_append_sheet(workbook, resumesSheet, 'Resume Uploads');
+      XLSX.utils.book_append_sheet(workbook, resumesSheet, "Resume Uploads");
     }
 
-    XLSX.writeFile(workbook, `All_Forms_${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.writeFile(
+      workbook,
+      `All_Forms_${new Date().toISOString().split("T")[0]}.xlsx`,
+    );
   };
 
   const getCurrentData = () => {
     switch (activeTab) {
-      case 'applications':
-        return { data: filteredApplications, filename: 'job_applications' };
-      case 'contacts':
-        return { data: filteredContacts, filename: 'contact_messages' };
-      case 'resumes':
-        return { data: filteredResumeUploads, filename: 'resume_uploads' };
-      case 'blogs':
-        return { data: filteredBlogPosts, filename: 'blog_posts' };
+      case "applications":
+        return { data: filteredApplications, filename: "job_applications" };
+      case "contacts":
+        return { data: filteredContacts, filename: "contact_messages" };
+      case "resumes":
+        return { data: filteredResumeUploads, filename: "resume_uploads" };
+      case "blogs":
+        return { data: filteredBlogPosts, filename: "blog_posts" };
       default:
-        return { data: [], filename: 'export' };
+        return { data: [], filename: "export" };
     }
   };
 
-  const openModal = (item: Application | Contact | ResumeUpload | BlogPost, type: "application" | "contact" | "resume" | "blog") => {
+  const openModal = (
+    item: Application | Contact | ResumeUpload | BlogPost,
+    type: "application" | "contact" | "resume" | "blog",
+  ) => {
     setSelectedItem(item);
     setModalType(type);
   };
@@ -451,7 +475,8 @@ export default function AdminDashboard() {
                   <span className="text-gradient">System</span> Dashboard
                 </h1>
                 <p className="text-foreground/70">
-                  Manage job applications, contact inquiries, and resume downloads
+                  Manage job applications, contact inquiries, and resume
+                  downloads
                 </p>
               </div>
               <div className="flex gap-3">
@@ -513,7 +538,6 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-
             <div className="bg-card-bg border border-border-subtle rounded-xl p-6">
               <div className="flex items-center gap-4">
                 <div className="bg-green-500/10 p-3 rounded-lg">
@@ -552,7 +576,7 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-foreground">
-                    {blogPosts.filter(post => post.published).length}
+                    {blogPosts.filter((post) => post.published).length}
                   </h3>
                   <p className="text-foreground/70">Published Posts</p>
                 </div>
@@ -566,7 +590,7 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-foreground">
-                    {blogPosts.filter(post => !post.published).length}
+                    {blogPosts.filter((post) => !post.published).length}
                   </h3>
                   <p className="text-foreground/70">Draft Posts</p>
                 </div>
@@ -580,7 +604,7 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-foreground">
-                    {blogPosts.filter(post => post.featured).length}
+                    {blogPosts.filter((post) => post.featured).length}
                   </h3>
                   <p className="text-foreground/70">Featured Posts</p>
                 </div>
@@ -645,10 +669,12 @@ export default function AdminDashboard() {
                     value={filter}
                     onChange={(e) => setFilter(e.target.value)}
                     placeholder={`Search ${
-                  activeTab === 'applications' ? 'by name, email, position...' :
-                  activeTab === 'contacts' ? 'by name, email, company...' :
-                  'by file name, applicant name...'
-                }`}
+                      activeTab === "applications"
+                        ? "by name, email, position..."
+                        : activeTab === "contacts"
+                          ? "by name, email, company..."
+                          : "by file name, applicant name..."
+                    }`}
                     className="w-full pl-12 pr-4 py-3 border border-border-subtle rounded-lg bg-background/50 text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-tech-blue"
                   />
                 </div>
@@ -696,7 +722,10 @@ export default function AdminDashboard() {
                   <button
                     onClick={exportAllToExcel}
                     className="px-4 py-3 bg-primary/10 text-primary border border-primary/20 rounded-lg hover:bg-primary/20 transition-colors font-medium whitespace-nowrap"
-                    disabled={filteredApplications.length === 0 && filteredResumeUploads.length === 0}
+                    disabled={
+                      filteredApplications.length === 0 &&
+                      filteredResumeUploads.length === 0
+                    }
                   >
                     Export All (2 Sheets)
                   </button>
@@ -781,8 +810,8 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex gap-2">
-                            {app.resume_url && (
-                              app.resume_url.startsWith('placeholder://') ? (
+                            {app.resume_url &&
+                              (app.resume_url.startsWith("placeholder://") ? (
                                 <div
                                   className="p-2 bg-gray-500/10 text-gray-500 rounded-lg cursor-not-allowed"
                                   title="Resume file - Storage not configured"
@@ -792,7 +821,7 @@ export default function AdminDashboard() {
                               ) : (
                                 <a
                                   href={app.resume_url}
-                                  download={`Resume_${app.full_name.replace(/\s+/g, '_')}.pdf`}
+                                  download={`Resume_${app.full_name.replace(/\s+/g, "_")}.pdf`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="p-2 bg-tech-blue/10 text-tech-blue rounded-lg hover:bg-tech-blue/20 transition-colors"
@@ -800,8 +829,7 @@ export default function AdminDashboard() {
                                 >
                                   <Download className="w-4 h-4" />
                                 </a>
-                              )
-                            )}
+                              ))}
                             <button
                               onClick={() => openModal(app, "application")}
                               className="p-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
@@ -901,7 +929,9 @@ export default function AdminDashboard() {
               <div>
                 {/* Blog Management Header */}
                 <div className="p-6 border-b border-border-subtle flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-foreground">Blog Posts Management</h3>
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Blog Posts Management
+                  </h3>
                   <button
                     onClick={startNewBlog}
                     className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
@@ -1020,8 +1050,12 @@ export default function AdminDashboard() {
                   {filteredBlogPosts.length === 0 && (
                     <div className="p-12 text-center text-foreground/70">
                       <BookOpen className="w-12 h-12 mx-auto mb-4 text-foreground/30" />
-                      <p className="text-lg font-medium mb-2">No blog posts found</p>
-                      <p className="text-sm">Create your first blog post to get started</p>
+                      <p className="text-lg font-medium mb-2">
+                        No blog posts found
+                      </p>
+                      <p className="text-sm">
+                        Create your first blog post to get started
+                      </p>
                       <button
                         onClick={startNewBlog}
                         className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2 mx-auto"
@@ -1079,7 +1113,7 @@ export default function AdminDashboard() {
                           <div className="flex gap-2">
                             <a
                               href={resume.file_url}
-                              download={`${resume.file_name.replace(/\.[^/.]+$/, '')}.pdf`}
+                              download={`${resume.file_name.replace(/\.[^/.]+$/, "")}.pdf`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="p-2 bg-tech-blue/10 text-tech-blue rounded-lg hover:bg-tech-blue/20 transition-colors"
@@ -1136,39 +1170,69 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Full Name</label>
-                      <p className="text-foreground">{(selectedItem as Application).full_name}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Full Name
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as Application).full_name}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Email</label>
-                      <p className="text-foreground">{(selectedItem as Application).email}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Email
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as Application).email}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Phone</label>
-                      <p className="text-foreground">{(selectedItem as Application).phone}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Phone
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as Application).phone}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Position</label>
-                      <p className="text-foreground">{(selectedItem as Application).position}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Position
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as Application).position}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Experience</label>
-                      <p className="text-foreground">{(selectedItem as Application).experience}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Experience
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as Application).experience}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Status</label>
-                      <p className="text-foreground capitalize">{(selectedItem as Application).status}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Status
+                      </label>
+                      <p className="text-foreground capitalize">
+                        {(selectedItem as Application).status}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Applied Date</label>
-                      <p className="text-foreground">{formatDate((selectedItem as Application).created_at)}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Applied Date
+                      </label>
+                      <p className="text-foreground">
+                        {formatDate((selectedItem as Application).created_at)}
+                      </p>
                     </div>
                     {(selectedItem as Application).resume_url && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Resume</label>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Resume
+                        </label>
                         <a
                           href={(selectedItem as Application).resume_url}
-                          download={`Resume_${(selectedItem as Application).full_name.replace(/\s+/g, '_')}.pdf`}
+                          download={`Resume_${(selectedItem as Application).full_name.replace(/\s+/g, "_")}.pdf`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-tech-blue hover:text-tech-blue/80 transition-colors"
@@ -1180,9 +1244,13 @@ export default function AdminDashboard() {
                     )}
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground/70">Cover Letter</label>
+                    <label className="text-sm font-medium text-foreground/70">
+                      Cover Letter
+                    </label>
                     <div className="mt-2 p-4 bg-background/50 rounded-lg">
-                      <p className="text-foreground whitespace-pre-wrap">{(selectedItem as Application).cover_letter}</p>
+                      <p className="text-foreground whitespace-pre-wrap">
+                        {(selectedItem as Application).cover_letter}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1192,34 +1260,58 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Name</label>
-                      <p className="text-foreground">{(selectedItem as Contact).name}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Name
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as Contact).name}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Email</label>
-                      <p className="text-foreground">{(selectedItem as Contact).email}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Email
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as Contact).email}
+                      </p>
                     </div>
                     {(selectedItem as Contact).phone && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Phone</label>
-                        <p className="text-foreground">{(selectedItem as Contact).phone}</p>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Phone
+                        </label>
+                        <p className="text-foreground">
+                          {(selectedItem as Contact).phone}
+                        </p>
                       </div>
                     )}
                     {(selectedItem as Contact).company && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Company</label>
-                        <p className="text-foreground">{(selectedItem as Contact).company}</p>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Company
+                        </label>
+                        <p className="text-foreground">
+                          {(selectedItem as Contact).company}
+                        </p>
                       </div>
                     )}
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Contact Date</label>
-                      <p className="text-foreground">{formatDate((selectedItem as Contact).created_at)}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Contact Date
+                      </label>
+                      <p className="text-foreground">
+                        {formatDate((selectedItem as Contact).created_at)}
+                      </p>
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground/70">Message</label>
+                    <label className="text-sm font-medium text-foreground/70">
+                      Message
+                    </label>
                     <div className="mt-2 p-4 bg-background/50 rounded-lg">
-                      <p className="text-foreground whitespace-pre-wrap">{(selectedItem as Contact).message}</p>
+                      <p className="text-foreground whitespace-pre-wrap">
+                        {(selectedItem as Contact).message}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1229,26 +1321,44 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">File Name</label>
-                      <p className="text-foreground">{(selectedItem as ResumeUpload).file_name}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        File Name
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as ResumeUpload).file_name}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Applicant Name</label>
-                      <p className="text-foreground">{(selectedItem as ResumeUpload).applicant_name || "-"}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Applicant Name
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as ResumeUpload).applicant_name || "-"}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Position</label>
-                      <p className="text-foreground">{(selectedItem as ResumeUpload).position || "-"}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Position
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as ResumeUpload).position || "-"}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Upload Date</label>
-                      <p className="text-foreground">{formatDate((selectedItem as ResumeUpload).uploaded_at)}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Upload Date
+                      </label>
+                      <p className="text-foreground">
+                        {formatDate((selectedItem as ResumeUpload).uploaded_at)}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Resume File</label>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Resume File
+                      </label>
                       <a
                         href={(selectedItem as ResumeUpload).file_url}
-                        download={`${(selectedItem as ResumeUpload).file_name.replace(/\.[^/.]+$/, '')}.pdf`}
+                        download={`${(selectedItem as ResumeUpload).file_name.replace(/\.[^/.]+$/, "")}.pdf`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 text-tech-blue hover:text-tech-blue/80 transition-colors"
@@ -1265,15 +1375,25 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Title</label>
-                      <p className="text-foreground">{(selectedItem as BlogPost).title}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Title
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as BlogPost).title}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Author</label>
-                      <p className="text-foreground">{(selectedItem as BlogPost).author}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Author
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as BlogPost).author}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Status</label>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Status
+                      </label>
                       <div className="flex gap-2">
                         <span
                           className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
@@ -1282,7 +1402,9 @@ export default function AdminDashboard() {
                               : "bg-yellow-100 text-yellow-800"
                           }`}
                         >
-                          {(selectedItem as BlogPost).published ? "Published" : "Draft"}
+                          {(selectedItem as BlogPost).published
+                            ? "Published"
+                            : "Draft"}
                         </span>
                         {(selectedItem as BlogPost).featured && (
                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -1292,26 +1414,44 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Read Time</label>
-                      <p className="text-foreground">{(selectedItem as BlogPost).readTime}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Read Time
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as BlogPost).readTime}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Created Date</label>
-                      <p className="text-foreground">{formatDate((selectedItem as BlogPost).created_at)}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Created Date
+                      </label>
+                      <p className="text-foreground">
+                        {formatDate((selectedItem as BlogPost).created_at)}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Updated Date</label>
-                      <p className="text-foreground">{formatDate((selectedItem as BlogPost).updated_at)}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Updated Date
+                      </label>
+                      <p className="text-foreground">
+                        {formatDate((selectedItem as BlogPost).updated_at)}
+                      </p>
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground/70">Excerpt</label>
+                    <label className="text-sm font-medium text-foreground/70">
+                      Excerpt
+                    </label>
                     <div className="mt-2 p-4 bg-background/50 rounded-lg">
-                      <p className="text-foreground">{(selectedItem as BlogPost).excerpt}</p>
+                      <p className="text-foreground">
+                        {(selectedItem as BlogPost).excerpt}
+                      </p>
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground/70">Tags</label>
+                    <label className="text-sm font-medium text-foreground/70">
+                      Tags
+                    </label>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {(selectedItem as BlogPost).tags.map((tag, index) => (
                         <span
@@ -1325,7 +1465,9 @@ export default function AdminDashboard() {
                   </div>
                   {(selectedItem as BlogPost).image && (
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Featured Image</label>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Featured Image
+                      </label>
                       <div className="mt-2">
                         <img
                           src={(selectedItem as BlogPost).image}
@@ -1336,9 +1478,13 @@ export default function AdminDashboard() {
                     </div>
                   )}
                   <div>
-                    <label className="text-sm font-medium text-foreground/70">Content</label>
+                    <label className="text-sm font-medium text-foreground/70">
+                      Content
+                    </label>
                     <div className="mt-2 p-4 bg-background/50 rounded-lg max-h-60 overflow-y-auto">
-                      <div className="text-foreground whitespace-pre-wrap">{(selectedItem as BlogPost).content}</div>
+                      <div className="text-foreground whitespace-pre-wrap">
+                        {(selectedItem as BlogPost).content}
+                      </div>
                     </div>
                   </div>
                 </div>
