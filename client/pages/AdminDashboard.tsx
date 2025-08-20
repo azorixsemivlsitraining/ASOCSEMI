@@ -85,8 +85,10 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [selectedItem, setSelectedItem] = useState<Application | Contact | ResumeUpload | null>(null);
-  const [modalType, setModalType] = useState<"application" | "contact" | "resume" | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Application | Contact | ResumeUpload | BlogPost | null>(null);
+  const [modalType, setModalType] = useState<"application" | "contact" | "resume" | "blog" | null>(null);
+  const [showBlogEditor, setShowBlogEditor] = useState(false);
+  const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
 
   const ADMIN_PASSWORD = "admin2024";
 
