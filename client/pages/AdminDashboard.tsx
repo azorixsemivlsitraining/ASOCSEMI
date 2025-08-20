@@ -1073,6 +1073,7 @@ export default function AdminDashboard() {
                 {modalType === "application" && "Job Application Details"}
                 {modalType === "contact" && "Contact Message Details"}
                 {modalType === "resume" && "Resume Upload Details"}
+                {modalType === "blog" && "Blog Post Details"}
               </h2>
               <button
                 onClick={closeModal}
