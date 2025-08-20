@@ -146,10 +146,13 @@ export default function AdminDashboard() {
 
       setResumeUploads(resumeData);
 
-      // Fetch blog posts - for now using localStorage
-      const savedBlogs = localStorage.getItem('ascosemi_blog_posts');
-      if (savedBlogs) {
-        setBlogPosts(JSON.parse(savedBlogs));
+      // Fetch blog posts from API
+      const blogsResponse = await fetch('/api/blogs');
+      if (blogsResponse.ok) {
+        const blogsResult = await blogsResponse.json();
+        if (blogsResult.success) {
+          setBlogPosts(blogsResult.data);
+        }
       }
     } catch (error) {
       console.error("Error fetching data:", error);
