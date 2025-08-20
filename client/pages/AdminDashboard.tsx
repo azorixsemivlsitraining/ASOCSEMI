@@ -54,6 +54,22 @@ interface ResumeUpload {
   position?: string;
 }
 
+interface BlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  author: string;
+  publishDate: string;
+  readTime: string;
+  image: string;
+  tags: string[];
+  featured: boolean;
+  published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export default function AdminDashboard() {
   const { user } = useAuth();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
