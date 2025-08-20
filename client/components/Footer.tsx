@@ -19,6 +19,7 @@ export default function Footer() {
     { name: "Our Team", href: "#" },
     { name: "Careers", href: "/careers" },
     { name: "Blog", href: "#" },
+    { name: "Contact Support", href: "/contact" },
     { name: "System", href: "/admin-dashboard" },
   ];
 
@@ -27,15 +28,7 @@ export default function Footer() {
       title: "Company",
       links: companyLinks,
     },
-    {
-      title: "Support",
-      links: [
-        { name: "Documentation", href: "#" },
-        { name: "Help Center", href: "#" },
-        { name: "Contact Support", href: "/contact" },
-        { name: "Community", href: "#" },
-      ],
-    },
+   
     {
       title: "Legal",
       links: [
