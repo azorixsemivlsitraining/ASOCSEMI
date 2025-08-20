@@ -87,26 +87,14 @@ function CompaniesShowcase() {
       logo: "https://cdn.builder.io/api/v1/image/assets%2F07ba826074254d3191a55ee32e800a58%2F118af7902fdc4533a8fa22f1be9f1c84?format=webp&width=800",
       alt: "SmartSoc Logo",
     },
-    {
-      name: "AMD",
-      logo: "https://cdn.builder.io/api/v1/image/assets%2F07ba826074254d3191a55ee32e800a58%2Fc3755ae89ce24881944cd0eef5ea471f?format=webp&width=800",
-      alt: "AMD Logo",
-    },
-    {
-      name: "LEADSOC",
-      logo: "https://cdn.builder.io/api/v1/image/assets%2F07ba826074254d3191a55ee32e800a58%2F292600500eea4fb19bd1e9034fa6b601?format=webp&width=800",
-      alt: "LeadSoc Logo",
-    },
+    
+    
     {
       name: "ANALOG DEVICES",
       logo: "https://cdn.builder.io/api/v1/image/assets%2F07ba826074254d3191a55ee32e800a58%2F04f39ce5525a452fa3da09ebe38378b2?format=webp&width=800",
       alt: "Analog Devices Logo",
     },
-    {
-      name: "QUALCOMM",
-      logo: "https://cdn.builder.io/api/v1/image/assets%2F07ba826074254d3191a55ee32e800a58%2F4c14a21c68d34b5385481d57e0fa6066?format=webp&width=800",
-      alt: "Qualcomm Logo",
-    },
+    
     {
       name: "L&T",
       logo: "https://cdn.builder.io/api/v1/image/assets%2F07ba826074254d3191a55ee32e800a58%2F924c0adb9e904533919e88dee2dafc42?format=webp&width=800",
