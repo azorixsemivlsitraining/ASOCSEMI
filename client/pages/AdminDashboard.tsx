@@ -198,6 +198,43 @@ export default function AdminDashboard() {
       resume.position?.toLowerCase().includes(filter.toLowerCase())
   );
 
+  const filteredBlogPosts = blogPosts.filter(
+    (post) =>
+      post.title.toLowerCase().includes(filter.toLowerCase()) ||
+      post.author.toLowerCase().includes(filter.toLowerCase()) ||
+      post.tags.some(tag => tag.toLowerCase().includes(filter.toLowerCase()))
+  );
+
+  // Blog management functions
+  const saveBlogPost = (post: BlogPost) => {
+    const updatedPosts = editingBlog
+      ? blogPosts.map(p => p.id === post.id ? { ...post, updated_at: new Date().toISOString() } : p)
+      : [...blogPosts, { ...post, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }];
+
+    setBlogPosts(updatedPosts);
+    localStorage.setItem('ascosemi_blog_posts', JSON.stringify(updatedPosts));
+    setShowBlogEditor(false);
+    setEditingBlog(null);
+  };
+
+  const deleteBlogPost = (id: string) => {
+    if (confirm('Are you sure you want to delete this blog post?')) {
+      const updatedPosts = blogPosts.filter(p => p.id !== id);
+      setBlogPosts(updatedPosts);
+      localStorage.setItem('ascosemi_blog_posts', JSON.stringify(updatedPosts));
+    }
+  };
+
+  const startEditBlog = (post: BlogPost) => {
+    setEditingBlog(post);
+    setShowBlogEditor(true);
+  };
+
+  const startNewBlog = () => {
+    setEditingBlog(null);
+    setShowBlogEditor(true);
+  };
+
   // Export functions
   const exportToCSV = (data: any[], filename: string) => {
     if (data.length === 0) return;
