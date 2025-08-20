@@ -51,7 +51,7 @@ export default function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <img
-              src="https://cdn.builder.io/api/v1/image/assets%2F5c07bd532d434c36b4bb2918deeee627%2Fe656648968d84393a26405208e9b2be2?format=webp&width=800"
+              src="https://cdn.builder.io/api/v1/image/assets%2F5c07bd532d434c36b4bb2918deeee627%2Fe656648968d84393a26405208e9b2be2?format=webp&width=2000"
               alt="ASCOSEMI Logo"
               className="h-20 sm:h-24 lg:h-28 w-auto"
             />
