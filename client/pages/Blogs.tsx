@@ -29,36 +29,14 @@ export default function Blogs() {
 
   const fetchBlogPosts = async () => {
     try {
-      // TODO: Replace with actual API call
-      // For now, using mock data
-      const mockPosts: BlogPost[] = [
-        {
-          id: "1",
-          title: "The Future of VLSI Design and Semiconductor Technology",
-          excerpt: "Exploring the latest trends and innovations shaping the semiconductor industry and VLSI design methodologies.",
-          content: "Full content here...",
-          author: "ASCOSEMI Team",
-          publishDate: "2024-12-20",
-          readTime: "5 min read",
-          image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-          tags: ["VLSI", "Semiconductor", "Technology"],
-          featured: true
-        },
-        {
-          id: "2",
-          title: "Advanced Circuit Design Techniques",
-          excerpt: "Deep dive into modern circuit design methodologies and best practices for optimal performance.",
-          content: "Full content here...",
-          author: "Technical Team",
-          publishDate: "2024-12-18",
-          readTime: "8 min read",
-          image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-          tags: ["Circuit Design", "Engineering"],
-          featured: false
-        }
-      ];
-      
-      setBlogPosts(mockPosts);
+      const response = await fetch('/api/blogs?published=true');
+      const result = await response.json();
+
+      if (result.success) {
+        setBlogPosts(result.data);
+      } else {
+        console.error("Error fetching blog posts:", result.error);
+      }
       setLoading(false);
     } catch (error) {
       console.error("Error fetching blog posts:", error);
