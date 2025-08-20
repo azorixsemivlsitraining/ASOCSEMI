@@ -1212,6 +1212,89 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               )}
+
+              {modalType === "blog" && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-foreground/70">Title</label>
+                      <p className="text-foreground">{(selectedItem as BlogPost).title}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground/70">Author</label>
+                      <p className="text-foreground">{(selectedItem as BlogPost).author}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground/70">Status</label>
+                      <div className="flex gap-2">
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            (selectedItem as BlogPost).published
+                              ? "bg-green-100 text-green-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {(selectedItem as BlogPost).published ? "Published" : "Draft"}
+                        </span>
+                        {(selectedItem as BlogPost).featured && (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            Featured
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground/70">Read Time</label>
+                      <p className="text-foreground">{(selectedItem as BlogPost).readTime}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground/70">Created Date</label>
+                      <p className="text-foreground">{formatDate((selectedItem as BlogPost).created_at)}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground/70">Updated Date</label>
+                      <p className="text-foreground">{formatDate((selectedItem as BlogPost).updated_at)}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground/70">Excerpt</label>
+                    <div className="mt-2 p-4 bg-background/50 rounded-lg">
+                      <p className="text-foreground">{(selectedItem as BlogPost).excerpt}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground/70">Tags</label>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {(selectedItem as BlogPost).tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-muted text-muted-foreground text-sm rounded"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  {(selectedItem as BlogPost).image && (
+                    <div>
+                      <label className="text-sm font-medium text-foreground/70">Featured Image</label>
+                      <div className="mt-2">
+                        <img
+                          src={(selectedItem as BlogPost).image}
+                          alt={(selectedItem as BlogPost).title}
+                          className="w-full h-48 object-cover rounded-lg"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div>
+                    <label className="text-sm font-medium text-foreground/70">Content</label>
+                    <div className="mt-2 p-4 bg-background/50 rounded-lg max-h-60 overflow-y-auto">
+                      <div className="text-foreground whitespace-pre-wrap">{(selectedItem as BlogPost).content}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="p-6 border-t border-border-subtle">
