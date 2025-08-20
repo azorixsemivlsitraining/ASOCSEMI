@@ -143,6 +143,15 @@ export default function Header() {
                   {link.name}
                 </Link>
               ))}
+              {!user && (
+                <Link
+                  to="/login"
+                  className="text-foreground/80 hover:text-tech-blue transition-colors duration-200 py-2 font-medium"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Admin Login
+                </Link>
+              )}
               {user ? (
                 <>
                   <div className="py-2 text-foreground/80 border-t border-border-subtle">
