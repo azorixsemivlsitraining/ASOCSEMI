@@ -327,7 +327,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const openModal = (item: Application | Contact | ResumeUpload, type: "application" | "contact" | "resume") => {
+  const openModal = (item: Application | Contact | ResumeUpload | BlogPost, type: "application" | "contact" | "resume" | "blog") => {
     setSelectedItem(item);
     setModalType(type);
   };
