@@ -17,6 +17,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import Header from "../components/Header";
+import BlogEditor from "../components/BlogEditor";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../lib/supabase";
 import * as XLSX from 'xlsx';
