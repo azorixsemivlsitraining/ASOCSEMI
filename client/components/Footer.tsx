@@ -96,7 +96,7 @@ export default function Footer() {
                   <span> +91 40-71553446</span>
                 </div>
                 <div className="flex items-center gap-3 text-muted-foreground">
-                  <MapPin className="w-4 h-4 text-tech-blue" />
+                  <MapPin className="w-4 h-[29px] text-tech-blue" />
                   <span>
                     ANANTHA SOFTWARE SOLUTIONS Pvt. Ltd., WeWork Rajapushpa
                     Summit Rajapushpa Summit, Financial District, Hyderabad,
