@@ -148,7 +148,7 @@ export default function Contact() {
                         Office
                       </h3>
                       <p className="text-foreground/70">
-                        WeWork Rajapushpa Summit Rajapushpa Summit,
+                        ANANTHA SOFTWARE SOLUTIONS Pvt. Ltd., WeWork Rajapushpa Summit Rajapushpa Summit,
                         Financial District,
                         Hyderabad, Telangana 500032.
 
