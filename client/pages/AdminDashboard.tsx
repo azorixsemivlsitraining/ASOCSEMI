@@ -254,11 +254,23 @@ export default function AdminDashboard() {
     }
   };
 
-  const deleteBlogPost = (id: string) => {
+  const deleteBlogPost = async (id: string) => {
     if (confirm('Are you sure you want to delete this blog post?')) {
-      const updatedPosts = blogPosts.filter(p => p.id !== id);
-      setBlogPosts(updatedPosts);
-      localStorage.setItem('ascosemi_blog_posts', JSON.stringify(updatedPosts));
+      try {
+        const response = await fetch(`/api/blogs/${id}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            setBlogPosts(prev => prev.filter(p => p.id !== id));
+          }
+        }
+      } catch (error) {
+        console.error('Error deleting blog post:', error);
+        alert('Error deleting blog post. Please try again.');
+      }
     }
   };
 
