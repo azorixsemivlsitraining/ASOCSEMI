@@ -480,6 +480,65 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          {/* Second row for blog stats */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="bg-card-bg border border-border-subtle rounded-xl p-6">
+              <div className="flex items-center gap-4">
+                <div className="bg-purple-500/10 p-3 rounded-lg">
+                  <BookOpen className="w-6 h-6 text-purple-500" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-foreground">
+                    {blogPosts.length}
+                  </h3>
+                  <p className="text-foreground/70">Total Blog Posts</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-card-bg border border-border-subtle rounded-xl p-6">
+              <div className="flex items-center gap-4">
+                <div className="bg-blue-500/10 p-3 rounded-lg">
+                  <Eye className="w-6 h-6 text-blue-500" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-foreground">
+                    {blogPosts.filter(post => post.published).length}
+                  </h3>
+                  <p className="text-foreground/70">Published Posts</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-card-bg border border-border-subtle rounded-xl p-6">
+              <div className="flex items-center gap-4">
+                <div className="bg-orange-500/10 p-3 rounded-lg">
+                  <FileText className="w-6 h-6 text-orange-500" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-foreground">
+                    {blogPosts.filter(post => !post.published).length}
+                  </h3>
+                  <p className="text-foreground/70">Draft Posts</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-card-bg border border-border-subtle rounded-xl p-6">
+              <div className="flex items-center gap-4">
+                <div className="bg-yellow-500/10 p-3 rounded-lg">
+                  <Users className="w-6 h-6 text-yellow-500" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-foreground">
+                    {blogPosts.filter(post => post.featured).length}
+                  </h3>
+                  <p className="text-foreground/70">Featured Posts</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Navigation Tabs */}
           <div className="bg-card-bg border border-border-subtle rounded-xl mb-6">
             <div className="flex">
