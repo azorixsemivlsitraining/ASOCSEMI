@@ -1,6 +1,25 @@
 import { RequestHandler } from "express";
 import path from "path";
 import fs from "fs";
+import multer from "multer";
+
+// Configure multer for memory storage
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Accept only image files
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'));
+    }
+  },
+});
+
+export const uploadMiddleware = upload.single('image');
 
 // Simple file upload handler
 // In production, you would use cloud storage (AWS S3, Google Cloud Storage, etc.)
