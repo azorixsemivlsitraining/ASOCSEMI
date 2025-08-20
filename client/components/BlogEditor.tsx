@@ -197,6 +197,10 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
                 src={formData.image}
                 alt={formData.title}
                 className="w-full h-64 object-cover rounded-lg mb-6"
+                onError={(e) => {
+                  console.error('Preview image failed to load:', formData.image);
+                  e.currentTarget.style.display = 'none';
+                }}
               />
             )}
             <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
