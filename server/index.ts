@@ -27,5 +27,13 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // Blog API routes
+  app.get("/api/blogs", getAllBlogs);
+  app.get("/api/blogs/:id", getBlogById);
+  app.post("/api/blogs", createBlog);
+  app.put("/api/blogs/:id", updateBlog);
+  app.delete("/api/blogs/:id", deleteBlog);
+  app.get("/api/blogs/tag/:tag", getBlogsByTag);
+
   return app;
 }
