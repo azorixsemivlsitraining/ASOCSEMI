@@ -73,6 +73,14 @@ export default function Header() {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
+            {!user && (
+              <Link
+                to="/login"
+                className="px-4 py-2 text-sm font-medium text-foreground/80 hover:text-tech-blue transition-colors duration-200"
+              >
+                Admin Login
+              </Link>
+            )}
             {user ? (
               <div className="relative">
                 <button
