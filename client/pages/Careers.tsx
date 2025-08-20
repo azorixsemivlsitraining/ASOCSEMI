@@ -439,7 +439,7 @@ export default function Careers() {
                         Phone: +91 40-71553446
                       </p>
                       <p className="text-muted-foreground">
-                        Address: ASOCSEMI SOLUTIONS PVT LTD, WeWork Rajapushpa Summit Rajapushpa Summit,
+                        Address: ASOCSEMI, ANANTHA SOFTWARE SOLUTIONS PVT LTD, WeWork Rajapushpa Summit Rajapushpa Summit,
                         Financial District, Hyderabad, Telangana 500032.
 
                       </p>
