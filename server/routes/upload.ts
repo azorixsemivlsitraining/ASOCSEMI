@@ -6,11 +6,19 @@ import fs from "fs";
 // In production, you would use cloud storage (AWS S3, Google Cloud Storage, etc.)
 export const uploadImage: RequestHandler = (req, res) => {
   try {
-    // For now, we'll return a placeholder URL
-    // In production, implement actual file upload logic
-    
-    const imageUrl = `https://images.unsplash.com/photo-${Date.now()}?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80`;
-    
+    // For demo purposes, return a working image URL from a reliable source
+    // You can replace this with actual file upload logic when ready
+    const sampleImages = [
+      "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1558618798-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    ];
+
+    const randomIndex = Math.floor(Math.random() * sampleImages.length);
+    const imageUrl = sampleImages[randomIndex];
+
     res.json({
       success: true,
       data: {
