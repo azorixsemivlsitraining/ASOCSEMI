@@ -98,8 +98,9 @@ export default function Footer() {
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <MapPin className="w-4 h-4 text-tech-blue" />
                   <span>
-                    ANANTHA SOFTWARE SOLUTIONS Pvt. Ltd., WeWork Rajapushpa Summit Rajapushpa Summit, Financial
-                    District, Hyderabad, Telangana 500032.
+                    ANANTHA SOFTWARE SOLUTIONS Pvt. Ltd., WeWork Rajapushpa
+                    Summit Rajapushpa Summit, Financial District, Hyderabad,
+                    Telangana 500032.
                   </span>
                 </div>
               </div>
