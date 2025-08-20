@@ -10,7 +10,7 @@ import {
   deleteBlog,
   getBlogsByTag
 } from "./routes/blogs";
-import { uploadImage, deleteImage } from "./routes/upload";
+import { uploadImage, deleteImage, uploadMiddleware } from "./routes/upload";
 
 export function createServer() {
   const app = express();
