@@ -35,6 +35,7 @@ export default function Header() {
     { name: "Vision", href: "/vision" },
     { name: "About us", href: "/about" },
     { name: "Careers", href: "/careers" },
+    { name: "Blogs", href: "/blogs" },
     { name: "Contact", href: "/contact" },
   ];
 
