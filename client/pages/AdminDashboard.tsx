@@ -78,7 +78,8 @@ export default function AdminDashboard() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [resumeUploads, setResumeUploads] = useState<ResumeUpload[]>([]);
-  const [activeTab, setActiveTab] = useState<"applications" | "contacts" | "resumes">(
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [activeTab, setActiveTab] = useState<"applications" | "contacts" | "resumes" | "blogs">(
     "applications",
   );
   const [loading, setLoading] = useState(true);
