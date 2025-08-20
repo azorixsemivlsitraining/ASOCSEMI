@@ -37,7 +37,7 @@ export function createServer() {
   app.get("/api/blogs/tag/:tag", getBlogsByTag);
 
   // Upload API routes
-  app.post("/api/upload/image", uploadImage);
+  app.post("/api/upload/image", uploadMiddleware, uploadImage);
   app.delete("/api/upload/image", deleteImage);
 
   return app;
