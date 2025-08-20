@@ -101,16 +101,26 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
     if (!file) return;
 
     setImageUploading(true);
-    
+
     try {
-      // For now, we'll use a placeholder URL
-      // In production, you would upload to a cloud storage service
-      const imageUrl = `https://images.unsplash.com/photo-${Date.now()}?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80`;
-      
-      setFormData(prev => ({
-        ...prev,
-        image: imageUrl
-      }));
+      const formDataUpload = new FormData();
+      formDataUpload.append('image', file);
+
+      const response = await fetch('/api/upload/image', {
+        method: 'POST',
+        body: formDataUpload,
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setFormData(prev => ({
+          ...prev,
+          image: result.data.url
+        }));
+      } else {
+        throw new Error(result.error || 'Upload failed');
+      }
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Error uploading image. Please try again.");
