@@ -111,47 +111,100 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     try {
       setLoading(true);
+      const errors: string[] = [];
 
-      // Fetch applications
-      const { data: applicationsData, error: appsError } = await supabase
-        .from("job_applications")
-        .select("*")
-        .order("created_at", { ascending: false });
+      // Fetch applications with detailed error handling
+      let applicationsData: Application[] = [];
+      try {
+        const { data, error: appsError } = await supabase
+          .from("job_applications")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-      if (appsError) throw appsError;
-      setApplications(applicationsData || []);
-
-      // Fetch contacts
-      const { data: contactsData, error: contactsError } = await supabase
-        .from("contacts")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (contactsError) throw contactsError;
-      setContacts(contactsData || []);
-
-      // Fetch get started requests
-      const { data: getStartedData, error: getStartedError } = await supabase
-        .from("get_started_requests")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (getStartedError) {
-        console.warn("get_started_requests table not found:", getStartedError);
-        setGetStartedRequests([]);
-      } else {
-        setGetStartedRequests(getStartedData || []);
+        if (appsError) {
+          console.error("Job applications error:", appsError);
+          errors.push(`Job applications: ${appsError.message}`);
+        } else {
+          applicationsData = data || [];
+          setApplications(applicationsData);
+        }
+      } catch (err) {
+        console.error("Job applications fetch failed:", err);
+        errors.push(`Job applications: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        setApplications([]);
       }
 
-      // Fetch resume uploads
-      const { data: resumeUploadsData, error: resumeError } = await supabase
-        .from("resume_uploads")
-        .select("*")
-        .order("created_at", { ascending: false });
+      // Fetch contacts with detailed error handling
+      try {
+        const { data: contactsData, error: contactsError } = await supabase
+          .from("contacts")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-      if (resumeError) {
-        console.warn("resume_uploads table not found:", resumeError);
-        // Create combined resume data from job applications
+        if (contactsError) {
+          console.error("Contacts error:", contactsError);
+          errors.push(`Contacts: ${contactsError.message}`);
+          setContacts([]);
+        } else {
+          setContacts(contactsData || []);
+        }
+      } catch (err) {
+        console.error("Contacts fetch failed:", err);
+        errors.push(`Contacts: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        setContacts([]);
+      }
+
+      // Fetch get started requests with detailed error handling
+      try {
+        const { data: getStartedData, error: getStartedError } = await supabase
+          .from("get_started_requests")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (getStartedError) {
+          console.warn("Get started requests error:", getStartedError);
+          // Don't add to errors array for optional tables
+          setGetStartedRequests([]);
+        } else {
+          setGetStartedRequests(getStartedData || []);
+        }
+      } catch (err) {
+        console.warn("Get started requests fetch failed:", err);
+        setGetStartedRequests([]);
+      }
+
+      // Fetch resume uploads with detailed error handling
+      try {
+        const { data: resumeUploadsData, error: resumeError } = await supabase
+          .from("resume_uploads")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (resumeError) {
+          console.warn("Resume uploads error:", resumeError);
+          // Create combined resume data from job applications as fallback
+          const combinedResumeData = applicationsData?.filter(app => app.resume_url).map(app => ({
+            id: app.id,
+            full_name: app.full_name,
+            email: app.email,
+            phone: app.phone,
+            location: "",
+            position_interested: app.position,
+            experience_level: app.experience,
+            skills: "",
+            cover_letter: app.cover_letter || "",
+            linkedin_url: "",
+            portfolio_url: "",
+            resume_url: app.resume_url,
+            created_at: app.created_at,
+          })) || [];
+          setResumeUploads(combinedResumeData);
+        } else {
+          setResumeUploads(resumeUploadsData || []);
+        }
+      } catch (err) {
+        console.warn("Resume uploads fetch failed:", err);
+        // Fallback to applications data
         const combinedResumeData = applicationsData?.filter(app => app.resume_url).map(app => ({
           id: app.id,
           full_name: app.full_name,
@@ -168,11 +221,18 @@ export default function AdminDashboard() {
           created_at: app.created_at,
         })) || [];
         setResumeUploads(combinedResumeData);
-      } else {
-        setResumeUploads(resumeUploadsData || []);
       }
+
+      // Show errors if any critical tables failed
+      if (errors.length > 0) {
+        console.error("Database errors detected:", errors);
+        alert(`Database setup needed:\n\n${errors.join('\n')}\n\nPlease run the database migration script in your Supabase project.`);
+      }
+
     } catch (error) {
-      console.error("Error fetching data:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      console.error("Fatal error fetching data:", error);
+      alert(`Database connection failed: ${errorMessage}\n\nPlease check your Supabase configuration and ensure the database is set up correctly.`);
     } finally {
       setLoading(false);
     }
