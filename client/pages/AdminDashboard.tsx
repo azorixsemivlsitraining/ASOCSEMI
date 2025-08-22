@@ -629,12 +629,28 @@ export default function AdminDashboard() {
 
                     <div className="bg-yellow-100 border border-yellow-200 rounded-lg p-4">
                       <h4 className="font-semibold text-yellow-800 mb-2">Setup Instructions:</h4>
-                      <ol className="text-sm text-yellow-700 space-y-1">
+                      <ol className="text-sm text-yellow-700 space-y-1 mb-4">
                         <li>1. Go to your <a href="https://supabase.com/dashboard/project/jrjwiamibemyxubqudgg" target="_blank" rel="noopener noreferrer" className="underline font-medium">Supabase Dashboard</a></li>
                         <li>2. Navigate to SQL Editor</li>
                         <li>3. Run the database-migration.sql script</li>
                         <li>4. Refresh this page to verify setup</li>
                       </ol>
+                      <div className="flex gap-3">
+                        <a
+                          href="/database-test"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm font-medium"
+                        >
+                          <Database className="w-4 h-4" />
+                          Run Database Test
+                        </a>
+                        <button
+                          onClick={() => window.location.reload()}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded-lg hover:bg-yellow-200 transition-colors text-sm font-medium"
+                        >
+                          <RefreshCw className="w-4 h-4" />
+                          Refresh Dashboard
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
