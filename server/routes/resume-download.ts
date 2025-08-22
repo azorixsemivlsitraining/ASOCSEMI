@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
-import fetch from 'node-fetch';
+import https from 'https';
+import http from 'http';
 
 interface ResumeDownloadRequest {
   url: string;
