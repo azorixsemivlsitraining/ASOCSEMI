@@ -19,7 +19,7 @@ import {
 import Header from "../components/Header";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../lib/supabase";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 interface Application {
   id: string;
@@ -79,16 +79,22 @@ export default function AdminDashboard() {
   const [passwordError, setPasswordError] = useState("");
   const [applications, setApplications] = useState<Application[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [getStartedRequests, setGetStartedRequests] = useState<GetStartedRequest[]>([]);
+  const [getStartedRequests, setGetStartedRequests] = useState<
+    GetStartedRequest[]
+  >([]);
   const [resumeUploads, setResumeUploads] = useState<ResumeUpload[]>([]);
-  const [activeTab, setActiveTab] = useState<"applications" | "contacts" | "get-started" | "resumes">(
-    "applications",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "applications" | "contacts" | "get-started" | "resumes"
+  >("applications");
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [selectedItem, setSelectedItem] = useState<Application | Contact | GetStartedRequest | ResumeUpload | null>(null);
-  const [modalType, setModalType] = useState<"application" | "contact" | "get-started" | "resume" | null>(null);
+  const [selectedItem, setSelectedItem] = useState<
+    Application | Contact | GetStartedRequest | ResumeUpload | null
+  >(null);
+  const [modalType, setModalType] = useState<
+    "application" | "contact" | "get-started" | "resume" | null
+  >(null);
   const [dbStatus, setDbStatus] = useState<{
     applications: boolean;
     contacts: boolean;
@@ -100,7 +106,7 @@ export default function AdminDashboard() {
     contacts: false,
     getStarted: false,
     resumes: false,
-    errors: []
+    errors: [],
   });
 
   const ADMIN_PASSWORD = "admin2024";
@@ -126,26 +132,28 @@ export default function AdminDashboard() {
   const testDatabaseConnection = async () => {
     try {
       // Simple connectivity test
-      const { error } = await supabase.from('_').select('*').limit(1);
-      if (error && error.code === 'PGRST116') {
+      const { error } = await supabase.from("_").select("*").limit(1);
+      if (error && error.code === "PGRST116") {
         // This is expected - table doesn't exist, but connection works
-        console.log('Database connection successful');
+        console.log("Database connection successful");
         fetchData();
       } else if (error) {
-        console.error('Database connection failed:', error);
-        setDbStatus(prev => ({
+        console.error("Database connection failed:", error);
+        setDbStatus((prev) => ({
           ...prev,
-          errors: [`Database connection failed: ${error.message}`]
+          errors: [`Database connection failed: ${error.message}`],
         }));
         setLoading(false);
       } else {
         fetchData();
       }
     } catch (error) {
-      console.error('Database connection test failed:', error);
-      setDbStatus(prev => ({
+      console.error("Database connection test failed:", error);
+      setDbStatus((prev) => ({
         ...prev,
-        errors: [`Connection test failed: ${error instanceof Error ? error.message : 'Unknown error'}`]
+        errors: [
+          `Connection test failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        ],
       }));
       setLoading(false);
     }
@@ -160,7 +168,7 @@ export default function AdminDashboard() {
         contacts: false,
         getStarted: false,
         resumes: false,
-        errors: [] as string[]
+        errors: [] as string[],
       };
 
       // Fetch applications with detailed error handling
@@ -182,7 +190,9 @@ export default function AdminDashboard() {
         }
       } catch (err) {
         console.error("Job applications fetch failed:", err);
-        errors.push(`Job applications table: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        errors.push(
+          `Job applications table: ${err instanceof Error ? err.message : "Unknown error"}`,
+        );
         setApplications([]);
         status.applications = false;
       }
@@ -205,7 +215,9 @@ export default function AdminDashboard() {
         }
       } catch (err) {
         console.error("Contacts fetch failed:", err);
-        errors.push(`Contacts table: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        errors.push(
+          `Contacts table: ${err instanceof Error ? err.message : "Unknown error"}`,
+        );
         setContacts([]);
         status.contacts = false;
       }
@@ -241,21 +253,24 @@ export default function AdminDashboard() {
         if (resumeError) {
           console.warn("Resume uploads error:", resumeError);
           // Create combined resume data from job applications as fallback
-          const combinedResumeData = applicationsData?.filter(app => app.resume_url).map(app => ({
-            id: app.id,
-            full_name: app.full_name,
-            email: app.email,
-            phone: app.phone,
-            location: "",
-            position_interested: app.position,
-            experience_level: app.experience,
-            skills: "",
-            cover_letter: app.cover_letter || "",
-            linkedin_url: "",
-            portfolio_url: "",
-            resume_url: app.resume_url,
-            created_at: app.created_at,
-          })) || [];
+          const combinedResumeData =
+            applicationsData
+              ?.filter((app) => app.resume_url)
+              .map((app) => ({
+                id: app.id,
+                full_name: app.full_name,
+                email: app.email,
+                phone: app.phone,
+                location: "",
+                position_interested: app.position,
+                experience_level: app.experience,
+                skills: "",
+                cover_letter: app.cover_letter || "",
+                linkedin_url: "",
+                portfolio_url: "",
+                resume_url: app.resume_url,
+                created_at: app.created_at,
+              })) || [];
           setResumeUploads(combinedResumeData);
           status.resumes = false;
         } else {
@@ -265,21 +280,24 @@ export default function AdminDashboard() {
       } catch (err) {
         console.warn("Resume uploads fetch failed:", err);
         // Fallback to applications data
-        const combinedResumeData = applicationsData?.filter(app => app.resume_url).map(app => ({
-          id: app.id,
-          full_name: app.full_name,
-          email: app.email,
-          phone: app.phone,
-          location: "",
-          position_interested: app.position,
-          experience_level: app.experience,
-          skills: "",
-          cover_letter: app.cover_letter || "",
-          linkedin_url: "",
-          portfolio_url: "",
-          resume_url: app.resume_url,
-          created_at: app.created_at,
-        })) || [];
+        const combinedResumeData =
+          applicationsData
+            ?.filter((app) => app.resume_url)
+            .map((app) => ({
+              id: app.id,
+              full_name: app.full_name,
+              email: app.email,
+              phone: app.phone,
+              location: "",
+              position_interested: app.position,
+              experience_level: app.experience,
+              skills: "",
+              cover_letter: app.cover_letter || "",
+              linkedin_url: "",
+              portfolio_url: "",
+              resume_url: app.resume_url,
+              created_at: app.created_at,
+            })) || [];
         setResumeUploads(combinedResumeData);
         status.resumes = false;
       }
@@ -287,11 +305,13 @@ export default function AdminDashboard() {
       // Update database status
       status.errors = errors;
       setDbStatus(status);
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
       console.error("Fatal error fetching data:", error);
-      alert(`Database connection failed: ${errorMessage}\n\nPlease check your Supabase configuration and ensure the database is set up correctly.`);
+      alert(
+        `Database connection failed: ${errorMessage}\n\nPlease check your Supabase configuration and ensure the database is set up correctly.`,
+      );
     } finally {
       setLoading(false);
     }
@@ -332,17 +352,19 @@ export default function AdminDashboard() {
 
   const filteredGetStartedRequests = getStartedRequests.filter(
     (request) =>
-      `${request.first_name} ${request.last_name}`.toLowerCase().includes(filter.toLowerCase()) ||
+      `${request.first_name} ${request.last_name}`
+        .toLowerCase()
+        .includes(filter.toLowerCase()) ||
       request.email.toLowerCase().includes(filter.toLowerCase()) ||
       request.company?.toLowerCase().includes(filter.toLowerCase()) ||
-      request.job_title?.toLowerCase().includes(filter.toLowerCase())
+      request.job_title?.toLowerCase().includes(filter.toLowerCase()),
   );
 
   const filteredResumeUploads = resumeUploads.filter(
     (resume) =>
       resume.full_name.toLowerCase().includes(filter.toLowerCase()) ||
       resume.email.toLowerCase().includes(filter.toLowerCase()) ||
-      resume.position_interested?.toLowerCase().includes(filter.toLowerCase())
+      resume.position_interested?.toLowerCase().includes(filter.toLowerCase()),
   );
 
   // Export functions
@@ -351,23 +373,28 @@ export default function AdminDashboard() {
 
     const headers = Object.keys(data[0]);
     const csvContent = [
-      headers.join(','),
-      ...data.map(row =>
-        headers.map(header => {
-          const value = row[header];
-          // Escape commas and quotes
-          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-            return `"${value.replace(/"/g, '""')}"`;
-          }
-          return value;
-        }).join(',')
-      )
-    ].join('\n');
+      headers.join(","),
+      ...data.map((row) =>
+        headers
+          .map((header) => {
+            const value = row[header];
+            // Escape commas and quotes
+            if (
+              typeof value === "string" &&
+              (value.includes(",") || value.includes('"'))
+            ) {
+              return `"${value.replace(/"/g, '""')}"`;
+            }
+            return value;
+          })
+          .join(","),
+      ),
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `${filename}_${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
   };
 
@@ -376,10 +403,10 @@ export default function AdminDashboard() {
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
 
     // Auto-size columns
-    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:A1');
+    const range = XLSX.utils.decode_range(worksheet["!ref"] || "A1:A1");
     const columnWidths: any[] = [];
     for (let C = range.s.c; C <= range.e.c; C++) {
       let maxWidth = 10;
@@ -393,9 +420,12 @@ export default function AdminDashboard() {
       }
       columnWidths.push({ wch: Math.min(maxWidth + 2, 50) });
     }
-    worksheet['!cols'] = columnWidths;
+    worksheet["!cols"] = columnWidths;
 
-    XLSX.writeFile(workbook, `${filename}_${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.writeFile(
+      workbook,
+      `${filename}_${new Date().toISOString().split("T")[0]}.xlsx`,
+    );
   };
 
   const exportAllToExcel = () => {
@@ -404,46 +434,65 @@ export default function AdminDashboard() {
     // Job Applications Sheet
     if (filteredApplications.length > 0) {
       const applicationsSheet = XLSX.utils.json_to_sheet(filteredApplications);
-      XLSX.utils.book_append_sheet(workbook, applicationsSheet, 'Job Applications');
+      XLSX.utils.book_append_sheet(
+        workbook,
+        applicationsSheet,
+        "Job Applications",
+      );
     }
 
     // Contact Messages Sheet
     if (filteredContacts.length > 0) {
       const contactsSheet = XLSX.utils.json_to_sheet(filteredContacts);
-      XLSX.utils.book_append_sheet(workbook, contactsSheet, 'Contact Messages');
+      XLSX.utils.book_append_sheet(workbook, contactsSheet, "Contact Messages");
     }
 
     // Get Started Requests Sheet
     if (filteredGetStartedRequests.length > 0) {
-      const getStartedSheet = XLSX.utils.json_to_sheet(filteredGetStartedRequests);
-      XLSX.utils.book_append_sheet(workbook, getStartedSheet, 'Get Started Requests');
+      const getStartedSheet = XLSX.utils.json_to_sheet(
+        filteredGetStartedRequests,
+      );
+      XLSX.utils.book_append_sheet(
+        workbook,
+        getStartedSheet,
+        "Get Started Requests",
+      );
     }
 
     // Resume Uploads Sheet
     if (filteredResumeUploads.length > 0) {
       const resumesSheet = XLSX.utils.json_to_sheet(filteredResumeUploads);
-      XLSX.utils.book_append_sheet(workbook, resumesSheet, 'Resume Uploads');
+      XLSX.utils.book_append_sheet(workbook, resumesSheet, "Resume Uploads");
     }
 
-    XLSX.writeFile(workbook, `All_Forms_Data_${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.writeFile(
+      workbook,
+      `All_Forms_Data_${new Date().toISOString().split("T")[0]}.xlsx`,
+    );
   };
 
   const getCurrentData = () => {
     switch (activeTab) {
-      case 'applications':
-        return { data: filteredApplications, filename: 'job_applications' };
-      case 'contacts':
-        return { data: filteredContacts, filename: 'contact_messages' };
-      case 'get-started':
-        return { data: filteredGetStartedRequests, filename: 'get_started_requests' };
-      case 'resumes':
-        return { data: filteredResumeUploads, filename: 'resume_uploads' };
+      case "applications":
+        return { data: filteredApplications, filename: "job_applications" };
+      case "contacts":
+        return { data: filteredContacts, filename: "contact_messages" };
+      case "get-started":
+        return {
+          data: filteredGetStartedRequests,
+          filename: "get_started_requests",
+        };
+      case "resumes":
+        return { data: filteredResumeUploads, filename: "resume_uploads" };
       default:
-        return { data: [], filename: 'export' };
+        return { data: [], filename: "export" };
     }
   };
 
-  const openModal = (item: Application | Contact | GetStartedRequest | ResumeUpload, type: "application" | "contact" | "get-started" | "resume") => {
+  const openModal = (
+    item: Application | Contact | GetStartedRequest | ResumeUpload,
+    type: "application" | "contact" | "get-started" | "resume",
+  ) => {
     setSelectedItem(item);
     setModalType(type);
   };
@@ -458,56 +507,73 @@ export default function AdminDashboard() {
   };
 
   // Download resume with format conversion
-  const downloadResume = async (url: string, filename: string, format: 'pdf' | 'docx' = 'pdf', applicantName?: string) => {
-    if (url.startsWith('placeholder://')) {
-      alert('Resume file storage not configured. Cannot download.');
+  const downloadResume = async (
+    url: string,
+    filename: string,
+    format: "pdf" | "docx" = "pdf",
+    applicantName?: string,
+  ) => {
+    if (url.startsWith("placeholder://")) {
+      alert("Resume file storage not configured. Cannot download.");
       return;
     }
 
     try {
-      const response = await fetch('/api/resume/download', {
-        method: 'POST',
+      const response = await fetch("/api/resume/download", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           url,
           filename,
           format,
-          applicantName
+          applicantName,
         }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Download failed');
+        throw new Error(error.error || "Download failed");
       }
 
       // Get the blob and create download link
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
 
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = downloadUrl;
-      link.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || `${filename}.${format}`;
+      link.download =
+        response.headers
+          .get("Content-Disposition")
+          ?.split("filename=")[1]
+          ?.replace(/"/g, "") || `${filename}.${format}`;
       link.click();
 
       // Clean up
       window.URL.revokeObjectURL(downloadUrl);
-
     } catch (error) {
-      console.error('Download error:', error);
-      alert(`Failed to download resume: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("Download error:", error);
+      alert(
+        `Failed to download resume: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
   };
 
   // Download multiple resumes
-  const downloadMultipleResumes = async (resumes: { url: string; filename: string; applicantName?: string }[]) => {
+  const downloadMultipleResumes = async (
+    resumes: { url: string; filename: string; applicantName?: string }[],
+  ) => {
     for (const resume of resumes) {
       try {
-        await downloadResume(resume.url, resume.filename, 'pdf', resume.applicantName);
+        await downloadResume(
+          resume.url,
+          resume.filename,
+          "pdf",
+          resume.applicantName,
+        );
         // Add small delay between downloads
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
       } catch (error) {
         console.error(`Failed to download ${resume.filename}:`, error);
       }
@@ -572,10 +638,12 @@ export default function AdminDashboard() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h1 className="text-4xl font-bold text-foreground mb-4">
-                  <span className="text-gradient">Comprehensive</span> Admin Dashboard
+                  <span className="text-gradient">Comprehensive</span> Admin
+                  Dashboard
                 </h1>
                 <p className="text-foreground/70">
-                  Manage all form submissions, applications, and resume downloads
+                  Manage all form submissions, applications, and resume
+                  downloads
                 </p>
               </div>
               <div className="flex gap-3">
@@ -607,32 +675,65 @@ export default function AdminDashboard() {
                       Database Setup Required
                     </h3>
                     <p className="text-yellow-700 mb-4">
-                      Some database tables are missing. Please run the database migration to set up all required tables.
+                      Some database tables are missing. Please run the database
+                      migration to set up all required tables.
                     </p>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                      <div className={`flex items-center gap-2 ${dbStatus.applications ? 'text-green-600' : 'text-red-600'}`}>
-                        <div className={`w-3 h-3 rounded-full ${dbStatus.applications ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                        <span className="text-sm font-medium">Job Applications</span>
+                      <div
+                        className={`flex items-center gap-2 ${dbStatus.applications ? "text-green-600" : "text-red-600"}`}
+                      >
+                        <div
+                          className={`w-3 h-3 rounded-full ${dbStatus.applications ? "bg-green-500" : "bg-red-500"}`}
+                        ></div>
+                        <span className="text-sm font-medium">
+                          Job Applications
+                        </span>
                       </div>
-                      <div className={`flex items-center gap-2 ${dbStatus.contacts ? 'text-green-600' : 'text-red-600'}`}>
-                        <div className={`w-3 h-3 rounded-full ${dbStatus.contacts ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                      <div
+                        className={`flex items-center gap-2 ${dbStatus.contacts ? "text-green-600" : "text-red-600"}`}
+                      >
+                        <div
+                          className={`w-3 h-3 rounded-full ${dbStatus.contacts ? "bg-green-500" : "bg-red-500"}`}
+                        ></div>
                         <span className="text-sm font-medium">Contacts</span>
                       </div>
-                      <div className={`flex items-center gap-2 ${dbStatus.getStarted ? 'text-green-600' : 'text-yellow-600'}`}>
-                        <div className={`w-3 h-3 rounded-full ${dbStatus.getStarted ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+                      <div
+                        className={`flex items-center gap-2 ${dbStatus.getStarted ? "text-green-600" : "text-yellow-600"}`}
+                      >
+                        <div
+                          className={`w-3 h-3 rounded-full ${dbStatus.getStarted ? "bg-green-500" : "bg-yellow-500"}`}
+                        ></div>
                         <span className="text-sm font-medium">Get Started</span>
                       </div>
-                      <div className={`flex items-center gap-2 ${dbStatus.resumes ? 'text-green-600' : 'text-yellow-600'}`}>
-                        <div className={`w-3 h-3 rounded-full ${dbStatus.resumes ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
-                        <span className="text-sm font-medium">Resume Uploads</span>
+                      <div
+                        className={`flex items-center gap-2 ${dbStatus.resumes ? "text-green-600" : "text-yellow-600"}`}
+                      >
+                        <div
+                          className={`w-3 h-3 rounded-full ${dbStatus.resumes ? "bg-green-500" : "bg-yellow-500"}`}
+                        ></div>
+                        <span className="text-sm font-medium">
+                          Resume Uploads
+                        </span>
                       </div>
                     </div>
 
                     <div className="bg-yellow-100 border border-yellow-200 rounded-lg p-4">
-                      <h4 className="font-semibold text-yellow-800 mb-2">Setup Instructions:</h4>
+                      <h4 className="font-semibold text-yellow-800 mb-2">
+                        Setup Instructions:
+                      </h4>
                       <ol className="text-sm text-yellow-700 space-y-1 mb-4">
-                        <li>1. Go to your <a href="https://supabase.com/dashboard/project/jrjwiamibemyxubqudgg" target="_blank" rel="noopener noreferrer" className="underline font-medium">Supabase Dashboard</a></li>
+                        <li>
+                          1. Go to your{" "}
+                          <a
+                            href="https://supabase.com/dashboard/project/jrjwiamibemyxubqudgg"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline font-medium"
+                          >
+                            Supabase Dashboard
+                          </a>
+                        </li>
                         <li>2. Navigate to SQL Editor</li>
                         <li>3. Run the database-migration.sql script</li>
                         <li>4. Refresh this page to verify setup</li>
@@ -776,10 +877,13 @@ export default function AdminDashboard() {
                     value={filter}
                     onChange={(e) => setFilter(e.target.value)}
                     placeholder={`Search ${
-                      activeTab === 'applications' ? 'by name, email, position...' :
-                      activeTab === 'contacts' ? 'by name, email, company...' :
-                      activeTab === 'get-started' ? 'by name, email, company, job title...' :
-                      'by name, email, position...'
+                      activeTab === "applications"
+                        ? "by name, email, position..."
+                        : activeTab === "contacts"
+                          ? "by name, email, company..."
+                          : activeTab === "get-started"
+                            ? "by name, email, company, job title..."
+                            : "by name, email, position..."
                     }`}
                     className="w-full pl-12 pr-4 py-3 border border-border-subtle rounded-lg bg-background/50 text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-tech-blue"
                   />
@@ -906,8 +1010,8 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex gap-2">
-                            {app.resume_url && (
-                              app.resume_url.startsWith('placeholder://') ? (
+                            {app.resume_url &&
+                              (app.resume_url.startsWith("placeholder://") ? (
                                 <div
                                   className="p-2 bg-gray-500/10 text-gray-500 rounded-lg cursor-not-allowed"
                                   title="Resume file - Storage not configured"
@@ -917,22 +1021,35 @@ export default function AdminDashboard() {
                               ) : (
                                 <div className="flex gap-1">
                                   <button
-                                    onClick={() => downloadResume(app.resume_url, `Resume_${app.full_name.replace(/\s+/g, '_')}`, 'pdf', app.full_name)}
+                                    onClick={() =>
+                                      downloadResume(
+                                        app.resume_url,
+                                        `Resume_${app.full_name.replace(/\s+/g, "_")}`,
+                                        "pdf",
+                                        app.full_name,
+                                      )
+                                    }
                                     className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors"
                                     title="Download as PDF"
                                   >
                                     <Download className="w-4 h-4" />
                                   </button>
                                   <button
-                                    onClick={() => downloadResume(app.resume_url, `Resume_${app.full_name.replace(/\s+/g, '_')}`, 'docx', app.full_name)}
+                                    onClick={() =>
+                                      downloadResume(
+                                        app.resume_url,
+                                        `Resume_${app.full_name.replace(/\s+/g, "_")}`,
+                                        "docx",
+                                        app.full_name,
+                                      )
+                                    }
                                     className="p-2 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500/20 transition-colors"
                                     title="Download as DOCX"
                                   >
                                     <FileText className="w-4 h-4" />
                                   </button>
                                 </div>
-                              )
-                            )}
+                              ))}
                             <button
                               onClick={() => openModal(app, "application")}
                               className="p-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
@@ -1171,8 +1288,10 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex gap-2">
-                            {resume.resume_url && (
-                              resume.resume_url.startsWith('placeholder://') ? (
+                            {resume.resume_url &&
+                              (resume.resume_url.startsWith(
+                                "placeholder://",
+                              ) ? (
                                 <div
                                   className="p-2 bg-gray-500/10 text-gray-500 rounded-lg cursor-not-allowed"
                                   title="Resume file - Storage not configured"
@@ -1182,22 +1301,35 @@ export default function AdminDashboard() {
                               ) : (
                                 <div className="flex gap-1">
                                   <button
-                                    onClick={() => downloadResume(resume.resume_url, `Resume_${resume.full_name.replace(/\s+/g, '_')}`, 'pdf', resume.full_name)}
+                                    onClick={() =>
+                                      downloadResume(
+                                        resume.resume_url,
+                                        `Resume_${resume.full_name.replace(/\s+/g, "_")}`,
+                                        "pdf",
+                                        resume.full_name,
+                                      )
+                                    }
                                     className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors"
                                     title="Download as PDF"
                                   >
                                     <Download className="w-4 h-4" />
                                   </button>
                                   <button
-                                    onClick={() => downloadResume(resume.resume_url, `Resume_${resume.full_name.replace(/\s+/g, '_')}`, 'docx', resume.full_name)}
+                                    onClick={() =>
+                                      downloadResume(
+                                        resume.resume_url,
+                                        `Resume_${resume.full_name.replace(/\s+/g, "_")}`,
+                                        "docx",
+                                        resume.full_name,
+                                      )
+                                    }
                                     className="p-2 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500/20 transition-colors"
                                     title="Download as DOCX"
                                   >
                                     <FileText className="w-4 h-4" />
                                   </button>
                                 </div>
-                              )
-                            )}
+                              ))}
                             <button
                               onClick={() => openModal(resume, "resume")}
                               className="p-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
@@ -1247,46 +1379,90 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Full Name</label>
-                      <p className="text-foreground">{(selectedItem as Application).full_name}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Full Name
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as Application).full_name}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Email</label>
-                      <p className="text-foreground">{(selectedItem as Application).email}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Email
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as Application).email}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Phone</label>
-                      <p className="text-foreground">{(selectedItem as Application).phone}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Phone
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as Application).phone}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Position</label>
-                      <p className="text-foreground">{(selectedItem as Application).position}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Position
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as Application).position}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Experience</label>
-                      <p className="text-foreground">{(selectedItem as Application).experience}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Experience
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as Application).experience}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Status</label>
-                      <p className="text-foreground capitalize">{(selectedItem as Application).status}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Status
+                      </label>
+                      <p className="text-foreground capitalize">
+                        {(selectedItem as Application).status}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Applied Date</label>
-                      <p className="text-foreground">{formatDate((selectedItem as Application).created_at)}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Applied Date
+                      </label>
+                      <p className="text-foreground">
+                        {formatDate((selectedItem as Application).created_at)}
+                      </p>
                     </div>
                     {(selectedItem as Application).resume_url && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Resume Downloads</label>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Resume Downloads
+                        </label>
                         <div className="flex gap-3 mt-2">
                           <button
-                            onClick={() => downloadResume((selectedItem as Application).resume_url, `Resume_${(selectedItem as Application).full_name.replace(/\s+/g, '_')}`, 'pdf', (selectedItem as Application).full_name)}
+                            onClick={() =>
+                              downloadResume(
+                                (selectedItem as Application).resume_url,
+                                `Resume_${(selectedItem as Application).full_name.replace(/\s+/g, "_")}`,
+                                "pdf",
+                                (selectedItem as Application).full_name,
+                              )
+                            }
                             className="inline-flex items-center gap-2 px-3 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors"
                           >
                             <Download className="w-4 h-4" />
                             Download PDF
                           </button>
                           <button
-                            onClick={() => downloadResume((selectedItem as Application).resume_url, `Resume_${(selectedItem as Application).full_name.replace(/\s+/g, '_')}`, 'docx', (selectedItem as Application).full_name)}
+                            onClick={() =>
+                              downloadResume(
+                                (selectedItem as Application).resume_url,
+                                `Resume_${(selectedItem as Application).full_name.replace(/\s+/g, "_")}`,
+                                "docx",
+                                (selectedItem as Application).full_name,
+                              )
+                            }
                             className="inline-flex items-center gap-2 px-3 py-2 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500/20 transition-colors"
                           >
                             <FileText className="w-4 h-4" />
@@ -1297,9 +1473,13 @@ export default function AdminDashboard() {
                     )}
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground/70">Cover Letter</label>
+                    <label className="text-sm font-medium text-foreground/70">
+                      Cover Letter
+                    </label>
                     <div className="mt-2 p-4 bg-background/50 rounded-lg">
-                      <p className="text-foreground whitespace-pre-wrap">{(selectedItem as Application).cover_letter}</p>
+                      <p className="text-foreground whitespace-pre-wrap">
+                        {(selectedItem as Application).cover_letter}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1309,34 +1489,58 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Name</label>
-                      <p className="text-foreground">{(selectedItem as Contact).name}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Name
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as Contact).name}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Email</label>
-                      <p className="text-foreground">{(selectedItem as Contact).email}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Email
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as Contact).email}
+                      </p>
                     </div>
                     {(selectedItem as Contact).phone && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Phone</label>
-                        <p className="text-foreground">{(selectedItem as Contact).phone}</p>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Phone
+                        </label>
+                        <p className="text-foreground">
+                          {(selectedItem as Contact).phone}
+                        </p>
                       </div>
                     )}
                     {(selectedItem as Contact).company && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Company</label>
-                        <p className="text-foreground">{(selectedItem as Contact).company}</p>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Company
+                        </label>
+                        <p className="text-foreground">
+                          {(selectedItem as Contact).company}
+                        </p>
                       </div>
                     )}
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Contact Date</label>
-                      <p className="text-foreground">{formatDate((selectedItem as Contact).created_at)}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Contact Date
+                      </label>
+                      <p className="text-foreground">
+                        {formatDate((selectedItem as Contact).created_at)}
+                      </p>
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground/70">Message</label>
+                    <label className="text-sm font-medium text-foreground/70">
+                      Message
+                    </label>
                     <div className="mt-2 p-4 bg-background/50 rounded-lg">
-                      <p className="text-foreground whitespace-pre-wrap">{(selectedItem as Contact).message}</p>
+                      <p className="text-foreground whitespace-pre-wrap">
+                        {(selectedItem as Contact).message}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1346,44 +1550,78 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">First Name</label>
-                      <p className="text-foreground">{(selectedItem as GetStartedRequest).first_name}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        First Name
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as GetStartedRequest).first_name}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Last Name</label>
-                      <p className="text-foreground">{(selectedItem as GetStartedRequest).last_name}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Last Name
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as GetStartedRequest).last_name}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Email</label>
-                      <p className="text-foreground">{(selectedItem as GetStartedRequest).email}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Email
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as GetStartedRequest).email}
+                      </p>
                     </div>
                     {(selectedItem as GetStartedRequest).phone && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Phone</label>
-                        <p className="text-foreground">{(selectedItem as GetStartedRequest).phone}</p>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Phone
+                        </label>
+                        <p className="text-foreground">
+                          {(selectedItem as GetStartedRequest).phone}
+                        </p>
                       </div>
                     )}
                     {(selectedItem as GetStartedRequest).company && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Company</label>
-                        <p className="text-foreground">{(selectedItem as GetStartedRequest).company}</p>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Company
+                        </label>
+                        <p className="text-foreground">
+                          {(selectedItem as GetStartedRequest).company}
+                        </p>
                       </div>
                     )}
                     {(selectedItem as GetStartedRequest).job_title && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Job Title</label>
-                        <p className="text-foreground">{(selectedItem as GetStartedRequest).job_title}</p>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Job Title
+                        </label>
+                        <p className="text-foreground">
+                          {(selectedItem as GetStartedRequest).job_title}
+                        </p>
                       </div>
                     )}
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Request Date</label>
-                      <p className="text-foreground">{formatDate((selectedItem as GetStartedRequest).created_at)}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Request Date
+                      </label>
+                      <p className="text-foreground">
+                        {formatDate(
+                          (selectedItem as GetStartedRequest).created_at,
+                        )}
+                      </p>
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground/70">Project Description</label>
+                    <label className="text-sm font-medium text-foreground/70">
+                      Project Description
+                    </label>
                     <div className="mt-2 p-4 bg-background/50 rounded-lg">
-                      <p className="text-foreground whitespace-pre-wrap">{(selectedItem as GetStartedRequest).message}</p>
+                      <p className="text-foreground whitespace-pre-wrap">
+                        {(selectedItem as GetStartedRequest).message}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1393,54 +1631,98 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Full Name</label>
-                      <p className="text-foreground">{(selectedItem as ResumeUpload).full_name}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Full Name
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as ResumeUpload).full_name}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Email</label>
-                      <p className="text-foreground">{(selectedItem as ResumeUpload).email}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Email
+                      </label>
+                      <p className="text-foreground">
+                        {(selectedItem as ResumeUpload).email}
+                      </p>
                     </div>
                     {(selectedItem as ResumeUpload).phone && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Phone</label>
-                        <p className="text-foreground">{(selectedItem as ResumeUpload).phone}</p>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Phone
+                        </label>
+                        <p className="text-foreground">
+                          {(selectedItem as ResumeUpload).phone}
+                        </p>
                       </div>
                     )}
                     {(selectedItem as ResumeUpload).location && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Location</label>
-                        <p className="text-foreground">{(selectedItem as ResumeUpload).location}</p>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Location
+                        </label>
+                        <p className="text-foreground">
+                          {(selectedItem as ResumeUpload).location}
+                        </p>
                       </div>
                     )}
                     {(selectedItem as ResumeUpload).position_interested && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Position Interest</label>
-                        <p className="text-foreground">{(selectedItem as ResumeUpload).position_interested}</p>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Position Interest
+                        </label>
+                        <p className="text-foreground">
+                          {(selectedItem as ResumeUpload).position_interested}
+                        </p>
                       </div>
                     )}
                     {(selectedItem as ResumeUpload).experience_level && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Experience Level</label>
-                        <p className="text-foreground">{(selectedItem as ResumeUpload).experience_level}</p>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Experience Level
+                        </label>
+                        <p className="text-foreground">
+                          {(selectedItem as ResumeUpload).experience_level}
+                        </p>
                       </div>
                     )}
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Submitted Date</label>
-                      <p className="text-foreground">{formatDate((selectedItem as ResumeUpload).created_at)}</p>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Submitted Date
+                      </label>
+                      <p className="text-foreground">
+                        {formatDate((selectedItem as ResumeUpload).created_at)}
+                      </p>
                     </div>
                     {(selectedItem as ResumeUpload).resume_url && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Resume Downloads</label>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Resume Downloads
+                        </label>
                         <div className="flex gap-3 mt-2">
                           <button
-                            onClick={() => downloadResume((selectedItem as ResumeUpload).resume_url, `Resume_${(selectedItem as ResumeUpload).full_name.replace(/\s+/g, '_')}`, 'pdf', (selectedItem as ResumeUpload).full_name)}
+                            onClick={() =>
+                              downloadResume(
+                                (selectedItem as ResumeUpload).resume_url,
+                                `Resume_${(selectedItem as ResumeUpload).full_name.replace(/\s+/g, "_")}`,
+                                "pdf",
+                                (selectedItem as ResumeUpload).full_name,
+                              )
+                            }
                             className="inline-flex items-center gap-2 px-3 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors"
                           >
                             <Download className="w-4 h-4" />
                             Download PDF
                           </button>
                           <button
-                            onClick={() => downloadResume((selectedItem as ResumeUpload).resume_url, `Resume_${(selectedItem as ResumeUpload).full_name.replace(/\s+/g, '_')}`, 'docx', (selectedItem as ResumeUpload).full_name)}
+                            onClick={() =>
+                              downloadResume(
+                                (selectedItem as ResumeUpload).resume_url,
+                                `Resume_${(selectedItem as ResumeUpload).full_name.replace(/\s+/g, "_")}`,
+                                "docx",
+                                (selectedItem as ResumeUpload).full_name,
+                              )
+                            }
                             className="inline-flex items-center gap-2 px-3 py-2 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500/20 transition-colors"
                           >
                             <FileText className="w-4 h-4" />
@@ -1452,24 +1734,34 @@ export default function AdminDashboard() {
                   </div>
                   {(selectedItem as ResumeUpload).skills && (
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Skills</label>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Skills
+                      </label>
                       <div className="mt-2 p-4 bg-background/50 rounded-lg">
-                        <p className="text-foreground">{(selectedItem as ResumeUpload).skills}</p>
+                        <p className="text-foreground">
+                          {(selectedItem as ResumeUpload).skills}
+                        </p>
                       </div>
                     </div>
                   )}
                   {(selectedItem as ResumeUpload).cover_letter && (
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Cover Letter</label>
+                      <label className="text-sm font-medium text-foreground/70">
+                        Cover Letter
+                      </label>
                       <div className="mt-2 p-4 bg-background/50 rounded-lg">
-                        <p className="text-foreground whitespace-pre-wrap">{(selectedItem as ResumeUpload).cover_letter}</p>
+                        <p className="text-foreground whitespace-pre-wrap">
+                          {(selectedItem as ResumeUpload).cover_letter}
+                        </p>
                       </div>
                     </div>
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {(selectedItem as ResumeUpload).linkedin_url && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">LinkedIn</label>
+                        <label className="text-sm font-medium text-foreground/70">
+                          LinkedIn
+                        </label>
                         <a
                           href={(selectedItem as ResumeUpload).linkedin_url}
                           target="_blank"
@@ -1482,7 +1774,9 @@ export default function AdminDashboard() {
                     )}
                     {(selectedItem as ResumeUpload).portfolio_url && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Portfolio</label>
+                        <label className="text-sm font-medium text-foreground/70">
+                          Portfolio
+                        </label>
                         <a
                           href={(selectedItem as ResumeUpload).portfolio_url}
                           target="_blank"

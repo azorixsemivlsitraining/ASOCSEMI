@@ -5,7 +5,7 @@ import { handleDemo } from "./routes/demo";
 import {
   handleResumeDownload,
   handleBatchResumeDownload,
-  handleResumeMetadata
+  handleResumeMetadata,
 } from "./routes/resume-download";
 
 export function createServer() {
