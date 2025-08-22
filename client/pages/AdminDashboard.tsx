@@ -999,11 +999,18 @@ export default function AdminDashboard() {
                               ) : (
                                 <div className="flex gap-1">
                                   <button
-                                    onClick={() => downloadResume(resume.resume_url, `Resume_${resume.full_name.replace(/\s+/g, '_')}`, 'pdf')}
-                                    className="p-2 bg-tech-blue/10 text-tech-blue rounded-lg hover:bg-tech-blue/20 transition-colors"
-                                    title="Download Resume as PDF"
+                                    onClick={() => downloadResume(resume.resume_url, `Resume_${resume.full_name.replace(/\s+/g, '_')}`, 'pdf', resume.full_name)}
+                                    className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors"
+                                    title="Download as PDF"
                                   >
                                     <Download className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => downloadResume(resume.resume_url, `Resume_${resume.full_name.replace(/\s+/g, '_')}`, 'docx', resume.full_name)}
+                                    className="p-2 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500/20 transition-colors"
+                                    title="Download as DOCX"
+                                  >
+                                    <FileText className="w-4 h-4" />
                                   </button>
                                 </div>
                               )
