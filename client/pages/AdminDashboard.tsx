@@ -11,6 +11,8 @@ import {
   ExternalLink,
   X,
   Lock,
+  FileSpreadsheet,
+  Archive,
 } from "lucide-react";
 import Header from "../components/Header";
 import { useAuth } from "../contexts/AuthContext";
@@ -40,14 +42,32 @@ interface Contact {
   created_at: string;
 }
 
+interface GetStartedRequest {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  company: string;
+  phone: string;
+  job_title: string;
+  message: string;
+  created_at: string;
+}
 
 interface ResumeUpload {
   id: string;
-  file_name: string;
-  file_url: string;
-  uploaded_at: string;
-  applicant_name?: string;
-  position?: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  location: string;
+  position_interested: string;
+  experience_level: string;
+  skills: string;
+  cover_letter: string;
+  linkedin_url: string;
+  portfolio_url: string;
+  resume_url: string;
+  created_at: string;
 }
 
 export default function AdminDashboard() {
@@ -57,15 +77,16 @@ export default function AdminDashboard() {
   const [passwordError, setPasswordError] = useState("");
   const [applications, setApplications] = useState<Application[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [getStartedRequests, setGetStartedRequests] = useState<GetStartedRequest[]>([]);
   const [resumeUploads, setResumeUploads] = useState<ResumeUpload[]>([]);
-  const [activeTab, setActiveTab] = useState<"applications" | "contacts" | "resumes">(
+  const [activeTab, setActiveTab] = useState<"applications" | "contacts" | "get-started" | "resumes">(
     "applications",
   );
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [selectedItem, setSelectedItem] = useState<Application | Contact | ResumeUpload | null>(null);
-  const [modalType, setModalType] = useState<"application" | "contact" | "resume" | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Application | Contact | GetStartedRequest | ResumeUpload | null>(null);
+  const [modalType, setModalType] = useState<"application" | "contact" | "get-started" | "resume" | null>(null);
 
   const ADMIN_PASSWORD = "admin2024";
 
@@ -109,18 +130,47 @@ export default function AdminDashboard() {
       if (contactsError) throw contactsError;
       setContacts(contactsData || []);
 
+      // Fetch get started requests
+      const { data: getStartedData, error: getStartedError } = await supabase
+        .from("get_started_requests")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-      // Fetch resume uploads (from job applications with resume URLs)
-      const resumeData = applicationsData?.filter(app => app.resume_url).map(app => ({
-        id: app.id,
-        file_name: `Resume_${app.full_name.replace(/\s+/g, '_')}.pdf`,
-        file_url: app.resume_url,
-        uploaded_at: app.created_at,
-        applicant_name: app.full_name,
-        position: app.position,
-      })) || [];
+      if (getStartedError) {
+        console.warn("get_started_requests table not found:", getStartedError);
+        setGetStartedRequests([]);
+      } else {
+        setGetStartedRequests(getStartedData || []);
+      }
 
-      setResumeUploads(resumeData);
+      // Fetch resume uploads
+      const { data: resumeUploadsData, error: resumeError } = await supabase
+        .from("resume_uploads")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (resumeError) {
+        console.warn("resume_uploads table not found:", resumeError);
+        // Create combined resume data from job applications
+        const combinedResumeData = applicationsData?.filter(app => app.resume_url).map(app => ({
+          id: app.id,
+          full_name: app.full_name,
+          email: app.email,
+          phone: app.phone,
+          location: "",
+          position_interested: app.position,
+          experience_level: app.experience,
+          skills: "",
+          cover_letter: app.cover_letter || "",
+          linkedin_url: "",
+          portfolio_url: "",
+          resume_url: app.resume_url,
+          created_at: app.created_at,
+        })) || [];
+        setResumeUploads(combinedResumeData);
+      } else {
+        setResumeUploads(resumeUploadsData || []);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -161,12 +211,19 @@ export default function AdminDashboard() {
       contact.company?.toLowerCase().includes(filter.toLowerCase()),
   );
 
+  const filteredGetStartedRequests = getStartedRequests.filter(
+    (request) =>
+      `${request.first_name} ${request.last_name}`.toLowerCase().includes(filter.toLowerCase()) ||
+      request.email.toLowerCase().includes(filter.toLowerCase()) ||
+      request.company?.toLowerCase().includes(filter.toLowerCase()) ||
+      request.job_title?.toLowerCase().includes(filter.toLowerCase())
+  );
 
   const filteredResumeUploads = resumeUploads.filter(
     (resume) =>
-      resume.file_name.toLowerCase().includes(filter.toLowerCase()) ||
-      resume.applicant_name?.toLowerCase().includes(filter.toLowerCase()) ||
-      resume.position?.toLowerCase().includes(filter.toLowerCase())
+      resume.full_name.toLowerCase().includes(filter.toLowerCase()) ||
+      resume.email.toLowerCase().includes(filter.toLowerCase()) ||
+      resume.position_interested?.toLowerCase().includes(filter.toLowerCase())
   );
 
   // Export functions
@@ -237,13 +294,19 @@ export default function AdminDashboard() {
       XLSX.utils.book_append_sheet(workbook, contactsSheet, 'Contact Messages');
     }
 
+    // Get Started Requests Sheet
+    if (filteredGetStartedRequests.length > 0) {
+      const getStartedSheet = XLSX.utils.json_to_sheet(filteredGetStartedRequests);
+      XLSX.utils.book_append_sheet(workbook, getStartedSheet, 'Get Started Requests');
+    }
+
     // Resume Uploads Sheet
     if (filteredResumeUploads.length > 0) {
       const resumesSheet = XLSX.utils.json_to_sheet(filteredResumeUploads);
       XLSX.utils.book_append_sheet(workbook, resumesSheet, 'Resume Uploads');
     }
 
-    XLSX.writeFile(workbook, `All_Forms_${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.writeFile(workbook, `All_Forms_Data_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   const getCurrentData = () => {
@@ -252,6 +315,8 @@ export default function AdminDashboard() {
         return { data: filteredApplications, filename: 'job_applications' };
       case 'contacts':
         return { data: filteredContacts, filename: 'contact_messages' };
+      case 'get-started':
+        return { data: filteredGetStartedRequests, filename: 'get_started_requests' };
       case 'resumes':
         return { data: filteredResumeUploads, filename: 'resume_uploads' };
       default:
@@ -259,7 +324,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const openModal = (item: Application | Contact | ResumeUpload, type: "application" | "contact" | "resume") => {
+  const openModal = (item: Application | Contact | GetStartedRequest | ResumeUpload, type: "application" | "contact" | "get-started" | "resume") => {
     setSelectedItem(item);
     setModalType(type);
   };
@@ -271,6 +336,22 @@ export default function AdminDashboard() {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
+  };
+
+  // Download resume with format conversion
+  const downloadResume = (url: string, filename: string, format: 'pdf' | 'docx' = 'pdf') => {
+    if (url.startsWith('placeholder://')) {
+      alert('Resume file storage not configured. Cannot download.');
+      return;
+    }
+
+    // For now, download the original file
+    // In a production system, you would implement format conversion on the server
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename.includes('.') ? filename : `${filename}.${format}`;
+    link.target = '_blank';
+    link.click();
   };
 
   // Password protection screen
@@ -286,10 +367,10 @@ export default function AdminDashboard() {
                   <Lock className="w-8 h-8 text-primary" />
                 </div>
                 <h1 className="text-2xl font-bold text-foreground mb-2">
-                  System
+                  Admin Dashboard
                 </h1>
                 <p className="text-foreground/70">
-                  Enter the admin password to access the system
+                  Enter the admin password to access the comprehensive dashboard
                 </p>
               </div>
 
@@ -311,7 +392,7 @@ export default function AdminDashboard() {
                   type="submit"
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg font-medium transition-colors"
                 >
-                  Access System
+                  Access Dashboard
                 </button>
               </form>
             </div>
@@ -331,20 +412,26 @@ export default function AdminDashboard() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h1 className="text-4xl font-bold text-foreground mb-4">
-                  <span className="text-gradient">System</span> Dashboard
+                  <span className="text-gradient">Comprehensive</span> Admin Dashboard
                 </h1>
                 <p className="text-foreground/70">
-                  Manage job applications, contact inquiries, and resume downloads
+                  Manage all form submissions, applications, and resume downloads
                 </p>
               </div>
               <div className="flex gap-3">
-                <a
-                  href="/resume-downloads"
+                <button
+                  onClick={exportAllToExcel}
                   className="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 flex items-center gap-2"
+                  disabled={
+                    filteredApplications.length === 0 && 
+                    filteredContacts.length === 0 && 
+                    filteredGetStartedRequests.length === 0 && 
+                    filteredResumeUploads.length === 0
+                  }
                 >
-                  <Download className="w-4 h-4" />
-                  Resume Downloads
-                </a>
+                  <Archive className="w-4 h-4" />
+                  Export All Data
+                </button>
               </div>
             </div>
           </div>
@@ -360,24 +447,7 @@ export default function AdminDashboard() {
                   <h3 className="text-2xl font-bold text-foreground">
                     {applications.length}
                   </h3>
-                  <p className="text-foreground/70">Total Applications</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-card-bg border border-border-subtle rounded-xl p-6">
-              <div className="flex items-center gap-4">
-                <div className="bg-green-500/10 p-3 rounded-lg">
-                  <Users className="w-6 h-6 text-green-500" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-foreground">
-                    {
-                      applications.filter((app) => app.status === "pending")
-                        .length
-                    }
-                  </h3>
-                  <p className="text-foreground/70">Pending Review</p>
+                  <p className="text-foreground/70">Job Applications</p>
                 </div>
               </div>
             </div>
@@ -396,6 +466,19 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+            <div className="bg-card-bg border border-border-subtle rounded-xl p-6">
+              <div className="flex items-center gap-4">
+                <div className="bg-coral/10 p-3 rounded-lg">
+                  <FileText className="w-6 h-6 text-coral" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-foreground">
+                    {getStartedRequests.length}
+                  </h3>
+                  <p className="text-foreground/70">Get Started Requests</p>
+                </div>
+              </div>
+            </div>
 
             <div className="bg-card-bg border border-border-subtle rounded-xl p-6">
               <div className="flex items-center gap-4">
@@ -414,10 +497,10 @@ export default function AdminDashboard() {
 
           {/* Navigation Tabs */}
           <div className="bg-card-bg border border-border-subtle rounded-xl mb-6">
-            <div className="flex">
+            <div className="flex overflow-x-auto">
               <button
                 onClick={() => setActiveTab("applications")}
-                className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
+                className={`flex-1 py-4 px-6 text-center font-medium transition-colors whitespace-nowrap ${
                   activeTab === "applications"
                     ? "bg-primary text-primary-foreground"
                     : "text-foreground/70 hover:text-foreground"
@@ -427,7 +510,7 @@ export default function AdminDashboard() {
               </button>
               <button
                 onClick={() => setActiveTab("contacts")}
-                className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
+                className={`flex-1 py-4 px-6 text-center font-medium transition-colors whitespace-nowrap ${
                   activeTab === "contacts"
                     ? "bg-primary text-primary-foreground"
                     : "text-foreground/70 hover:text-foreground"
@@ -436,14 +519,24 @@ export default function AdminDashboard() {
                 Contact Messages ({contacts.length})
               </button>
               <button
+                onClick={() => setActiveTab("get-started")}
+                className={`flex-1 py-4 px-6 text-center font-medium transition-colors whitespace-nowrap ${
+                  activeTab === "get-started"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground/70 hover:text-foreground"
+                }`}
+              >
+                Get Started ({getStartedRequests.length})
+              </button>
+              <button
                 onClick={() => setActiveTab("resumes")}
-                className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
+                className={`flex-1 py-4 px-6 text-center font-medium transition-colors whitespace-nowrap ${
                   activeTab === "resumes"
                     ? "bg-primary text-primary-foreground"
                     : "text-foreground/70 hover:text-foreground"
                 }`}
               >
-                Resumes ({resumeUploads.length})
+                Resume Uploads ({resumeUploads.length})
               </button>
             </div>
           </div>
@@ -459,10 +552,11 @@ export default function AdminDashboard() {
                     value={filter}
                     onChange={(e) => setFilter(e.target.value)}
                     placeholder={`Search ${
-                  activeTab === 'applications' ? 'by name, email, position...' :
-                  activeTab === 'contacts' ? 'by name, email, company...' :
-                  'by file name, applicant name...'
-                }`}
+                      activeTab === 'applications' ? 'by name, email, position...' :
+                      activeTab === 'contacts' ? 'by name, email, company...' :
+                      activeTab === 'get-started' ? 'by name, email, company, job title...' :
+                      'by name, email, position...'
+                    }`}
                     className="w-full pl-12 pr-4 py-3 border border-border-subtle rounded-lg bg-background/50 text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-tech-blue"
                   />
                 </div>
@@ -506,13 +600,6 @@ export default function AdminDashboard() {
                     disabled={getCurrentData().data.length === 0}
                   >
                     Export Excel
-                  </button>
-                  <button
-                    onClick={exportAllToExcel}
-                    className="px-4 py-3 bg-primary/10 text-primary border border-primary/20 rounded-lg hover:bg-primary/20 transition-colors font-medium whitespace-nowrap"
-                    disabled={filteredApplications.length === 0 && filteredResumeUploads.length === 0}
-                  >
-                    Export All (2 Sheets)
                   </button>
                 </div>
               </div>
@@ -604,16 +691,15 @@ export default function AdminDashboard() {
                                   <Download className="w-4 h-4" />
                                 </div>
                               ) : (
-                                <a
-                                  href={app.resume_url}
-                                  download={`Resume_${app.full_name.replace(/\s+/g, '_')}.pdf`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="p-2 bg-tech-blue/10 text-tech-blue rounded-lg hover:bg-tech-blue/20 transition-colors"
-                                  title="Download Resume as PDF"
-                                >
-                                  <Download className="w-4 h-4" />
-                                </a>
+                                <div className="flex gap-1">
+                                  <button
+                                    onClick={() => downloadResume(app.resume_url, `Resume_${app.full_name.replace(/\s+/g, '_')}`, 'pdf')}
+                                    className="p-2 bg-tech-blue/10 text-tech-blue rounded-lg hover:bg-tech-blue/20 transition-colors"
+                                    title="Download Resume as PDF"
+                                  >
+                                    <Download className="w-4 h-4" />
+                                  </button>
+                                </div>
                               )
                             )}
                             <button
@@ -711,19 +797,108 @@ export default function AdminDashboard() {
                   </div>
                 )}
               </div>
+            ) : activeTab === "get-started" ? (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="border-b border-border-subtle">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-foreground font-medium">
+                        Name
+                      </th>
+                      <th className="px-6 py-4 text-left text-foreground font-medium">
+                        Contact Info
+                      </th>
+                      <th className="px-6 py-4 text-left text-foreground font-medium">
+                        Company & Role
+                      </th>
+                      <th className="px-6 py-4 text-left text-foreground font-medium">
+                        Message
+                      </th>
+                      <th className="px-6 py-4 text-left text-foreground font-medium">
+                        Date
+                      </th>
+                      <th className="px-6 py-4 text-left text-foreground font-medium">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredGetStartedRequests.map((request) => (
+                      <tr
+                        key={request.id}
+                        className="border-b border-border-subtle/50 hover:bg-background/50"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="font-medium text-foreground">
+                            {request.first_name} {request.last_name}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div>
+                            <div className="text-sm text-foreground">
+                              {request.email}
+                            </div>
+                            {request.phone && (
+                              <div className="text-sm text-foreground/70">
+                                {request.phone}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div>
+                            <div className="text-foreground">
+                              {request.company || "-"}
+                            </div>
+                            {request.job_title && (
+                              <div className="text-sm text-foreground/70">
+                                {request.job_title}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td
+                          className="px-6 py-4 text-foreground max-w-xs truncate"
+                          title={request.message}
+                        >
+                          {request.message}
+                        </td>
+                        <td className="px-6 py-4 text-foreground/70 text-sm">
+                          {new Date(request.created_at).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={() => openModal(request, "get-started")}
+                            className="p-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+                            title="View Details"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {filteredGetStartedRequests.length === 0 && (
+                  <div className="p-12 text-center text-foreground/70">
+                    No get started requests found.
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="border-b border-border-subtle">
                     <tr>
                       <th className="px-6 py-4 text-left text-foreground font-medium">
-                        File Name
-                      </th>
-                      <th className="px-6 py-4 text-left text-foreground font-medium">
                         Applicant
                       </th>
                       <th className="px-6 py-4 text-left text-foreground font-medium">
-                        Position
+                        Position Interest
+                      </th>
+                      <th className="px-6 py-4 text-left text-foreground font-medium">
+                        Experience Level
                       </th>
                       <th className="px-6 py-4 text-left text-foreground font-medium">
                         Upload Date
@@ -740,31 +915,51 @@ export default function AdminDashboard() {
                         className="border-b border-border-subtle/50 hover:bg-background/50"
                       >
                         <td className="px-6 py-4">
-                          <div className="font-medium text-foreground">
-                            {resume.file_name}
+                          <div>
+                            <div className="font-medium text-foreground">
+                              {resume.full_name}
+                            </div>
+                            <div className="text-sm text-foreground/70">
+                              {resume.email}
+                            </div>
+                            {resume.phone && (
+                              <div className="text-sm text-foreground/70">
+                                {resume.phone}
+                              </div>
+                            )}
                           </div>
                         </td>
                         <td className="px-6 py-4 text-foreground">
-                          {resume.applicant_name || "-"}
+                          {resume.position_interested || "-"}
                         </td>
                         <td className="px-6 py-4 text-foreground">
-                          {resume.position || "-"}
+                          {resume.experience_level || "-"}
                         </td>
                         <td className="px-6 py-4 text-foreground/70 text-sm">
-                          {new Date(resume.uploaded_at).toLocaleDateString()}
+                          {new Date(resume.created_at).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex gap-2">
-                            <a
-                              href={resume.file_url}
-                              download={`${resume.file_name.replace(/\.[^/.]+$/, '')}.pdf`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-2 bg-tech-blue/10 text-tech-blue rounded-lg hover:bg-tech-blue/20 transition-colors"
-                              title="Download Resume as PDF"
-                            >
-                              <Download className="w-4 h-4" />
-                            </a>
+                            {resume.resume_url && (
+                              resume.resume_url.startsWith('placeholder://') ? (
+                                <div
+                                  className="p-2 bg-gray-500/10 text-gray-500 rounded-lg cursor-not-allowed"
+                                  title="Resume file - Storage not configured"
+                                >
+                                  <Download className="w-4 h-4" />
+                                </div>
+                              ) : (
+                                <div className="flex gap-1">
+                                  <button
+                                    onClick={() => downloadResume(resume.resume_url, `Resume_${resume.full_name.replace(/\s+/g, '_')}`, 'pdf')}
+                                    className="p-2 bg-tech-blue/10 text-tech-blue rounded-lg hover:bg-tech-blue/20 transition-colors"
+                                    title="Download Resume as PDF"
+                                  >
+                                    <Download className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              )
+                            )}
                             <button
                               onClick={() => openModal(resume, "resume")}
                               className="p-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
@@ -798,6 +993,7 @@ export default function AdminDashboard() {
               <h2 className="text-2xl font-bold text-foreground">
                 {modalType === "application" && "Job Application Details"}
                 {modalType === "contact" && "Contact Message Details"}
+                {modalType === "get-started" && "Get Started Request Details"}
                 {modalType === "resume" && "Resume Upload Details"}
               </h2>
               <button
@@ -843,16 +1039,15 @@ export default function AdminDashboard() {
                     {(selectedItem as Application).resume_url && (
                       <div>
                         <label className="text-sm font-medium text-foreground/70">Resume</label>
-                        <a
-                          href={(selectedItem as Application).resume_url}
-                          download={`Resume_${(selectedItem as Application).full_name.replace(/\s+/g, '_')}.pdf`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-tech-blue hover:text-tech-blue/80 transition-colors"
-                        >
-                          <Download className="w-4 h-4" />
-                          Download Resume as PDF
-                        </a>
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            onClick={() => downloadResume((selectedItem as Application).resume_url, `Resume_${(selectedItem as Application).full_name.replace(/\s+/g, '_')}`, 'pdf')}
+                            className="inline-flex items-center gap-2 text-tech-blue hover:text-tech-blue/80 transition-colors"
+                          >
+                            <Download className="w-4 h-4" />
+                            Download PDF
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -902,38 +1097,150 @@ export default function AdminDashboard() {
                 </div>
               )}
 
+              {modalType === "get-started" && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-foreground/70">First Name</label>
+                      <p className="text-foreground">{(selectedItem as GetStartedRequest).first_name}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground/70">Last Name</label>
+                      <p className="text-foreground">{(selectedItem as GetStartedRequest).last_name}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground/70">Email</label>
+                      <p className="text-foreground">{(selectedItem as GetStartedRequest).email}</p>
+                    </div>
+                    {(selectedItem as GetStartedRequest).phone && (
+                      <div>
+                        <label className="text-sm font-medium text-foreground/70">Phone</label>
+                        <p className="text-foreground">{(selectedItem as GetStartedRequest).phone}</p>
+                      </div>
+                    )}
+                    {(selectedItem as GetStartedRequest).company && (
+                      <div>
+                        <label className="text-sm font-medium text-foreground/70">Company</label>
+                        <p className="text-foreground">{(selectedItem as GetStartedRequest).company}</p>
+                      </div>
+                    )}
+                    {(selectedItem as GetStartedRequest).job_title && (
+                      <div>
+                        <label className="text-sm font-medium text-foreground/70">Job Title</label>
+                        <p className="text-foreground">{(selectedItem as GetStartedRequest).job_title}</p>
+                      </div>
+                    )}
+                    <div>
+                      <label className="text-sm font-medium text-foreground/70">Request Date</label>
+                      <p className="text-foreground">{formatDate((selectedItem as GetStartedRequest).created_at)}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground/70">Project Description</label>
+                    <div className="mt-2 p-4 bg-background/50 rounded-lg">
+                      <p className="text-foreground whitespace-pre-wrap">{(selectedItem as GetStartedRequest).message}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {modalType === "resume" && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">File Name</label>
-                      <p className="text-foreground">{(selectedItem as ResumeUpload).file_name}</p>
+                      <label className="text-sm font-medium text-foreground/70">Full Name</label>
+                      <p className="text-foreground">{(selectedItem as ResumeUpload).full_name}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Applicant Name</label>
-                      <p className="text-foreground">{(selectedItem as ResumeUpload).applicant_name || "-"}</p>
+                      <label className="text-sm font-medium text-foreground/70">Email</label>
+                      <p className="text-foreground">{(selectedItem as ResumeUpload).email}</p>
                     </div>
+                    {(selectedItem as ResumeUpload).phone && (
+                      <div>
+                        <label className="text-sm font-medium text-foreground/70">Phone</label>
+                        <p className="text-foreground">{(selectedItem as ResumeUpload).phone}</p>
+                      </div>
+                    )}
+                    {(selectedItem as ResumeUpload).location && (
+                      <div>
+                        <label className="text-sm font-medium text-foreground/70">Location</label>
+                        <p className="text-foreground">{(selectedItem as ResumeUpload).location}</p>
+                      </div>
+                    )}
+                    {(selectedItem as ResumeUpload).position_interested && (
+                      <div>
+                        <label className="text-sm font-medium text-foreground/70">Position Interest</label>
+                        <p className="text-foreground">{(selectedItem as ResumeUpload).position_interested}</p>
+                      </div>
+                    )}
+                    {(selectedItem as ResumeUpload).experience_level && (
+                      <div>
+                        <label className="text-sm font-medium text-foreground/70">Experience Level</label>
+                        <p className="text-foreground">{(selectedItem as ResumeUpload).experience_level}</p>
+                      </div>
+                    )}
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Position</label>
-                      <p className="text-foreground">{(selectedItem as ResumeUpload).position || "-"}</p>
+                      <label className="text-sm font-medium text-foreground/70">Submitted Date</label>
+                      <p className="text-foreground">{formatDate((selectedItem as ResumeUpload).created_at)}</p>
                     </div>
+                    {(selectedItem as ResumeUpload).resume_url && (
+                      <div>
+                        <label className="text-sm font-medium text-foreground/70">Resume</label>
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            onClick={() => downloadResume((selectedItem as ResumeUpload).resume_url, `Resume_${(selectedItem as ResumeUpload).full_name.replace(/\s+/g, '_')}`, 'pdf')}
+                            className="inline-flex items-center gap-2 text-tech-blue hover:text-tech-blue/80 transition-colors"
+                          >
+                            <Download className="w-4 h-4" />
+                            Download PDF
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {(selectedItem as ResumeUpload).skills && (
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Upload Date</label>
-                      <p className="text-foreground">{formatDate((selectedItem as ResumeUpload).uploaded_at)}</p>
+                      <label className="text-sm font-medium text-foreground/70">Skills</label>
+                      <div className="mt-2 p-4 bg-background/50 rounded-lg">
+                        <p className="text-foreground">{(selectedItem as ResumeUpload).skills}</p>
+                      </div>
                     </div>
+                  )}
+                  {(selectedItem as ResumeUpload).cover_letter && (
                     <div>
-                      <label className="text-sm font-medium text-foreground/70">Resume File</label>
-                      <a
-                        href={(selectedItem as ResumeUpload).file_url}
-                        download={`${(selectedItem as ResumeUpload).file_name.replace(/\.[^/.]+$/, '')}.pdf`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-tech-blue hover:text-tech-blue/80 transition-colors"
-                      >
-                        <Download className="w-4 h-4" />
-                        Download Resume as PDF
-                      </a>
+                      <label className="text-sm font-medium text-foreground/70">Cover Letter</label>
+                      <div className="mt-2 p-4 bg-background/50 rounded-lg">
+                        <p className="text-foreground whitespace-pre-wrap">{(selectedItem as ResumeUpload).cover_letter}</p>
+                      </div>
                     </div>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {(selectedItem as ResumeUpload).linkedin_url && (
+                      <div>
+                        <label className="text-sm font-medium text-foreground/70">LinkedIn</label>
+                        <a
+                          href={(selectedItem as ResumeUpload).linkedin_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-tech-blue hover:text-tech-blue/80 transition-colors break-all"
+                        >
+                          {(selectedItem as ResumeUpload).linkedin_url}
+                        </a>
+                      </div>
+                    )}
+                    {(selectedItem as ResumeUpload).portfolio_url && (
+                      <div>
+                        <label className="text-sm font-medium text-foreground/70">Portfolio</label>
+                        <a
+                          href={(selectedItem as ResumeUpload).portfolio_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-tech-blue hover:text-tech-blue/80 transition-colors break-all"
+                        >
+                          {(selectedItem as ResumeUpload).portfolio_url}
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
