@@ -1247,14 +1247,21 @@ export default function AdminDashboard() {
                     </div>
                     {(selectedItem as ResumeUpload).resume_url && (
                       <div>
-                        <label className="text-sm font-medium text-foreground/70">Resume</label>
-                        <div className="flex gap-2 mt-1">
+                        <label className="text-sm font-medium text-foreground/70">Resume Downloads</label>
+                        <div className="flex gap-3 mt-2">
                           <button
-                            onClick={() => downloadResume((selectedItem as ResumeUpload).resume_url, `Resume_${(selectedItem as ResumeUpload).full_name.replace(/\s+/g, '_')}`, 'pdf')}
-                            className="inline-flex items-center gap-2 text-tech-blue hover:text-tech-blue/80 transition-colors"
+                            onClick={() => downloadResume((selectedItem as ResumeUpload).resume_url, `Resume_${(selectedItem as ResumeUpload).full_name.replace(/\s+/g, '_')}`, 'pdf', (selectedItem as ResumeUpload).full_name)}
+                            className="inline-flex items-center gap-2 px-3 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors"
                           >
                             <Download className="w-4 h-4" />
                             Download PDF
+                          </button>
+                          <button
+                            onClick={() => downloadResume((selectedItem as ResumeUpload).resume_url, `Resume_${(selectedItem as ResumeUpload).full_name.replace(/\s+/g, '_')}`, 'docx', (selectedItem as ResumeUpload).full_name)}
+                            className="inline-flex items-center gap-2 px-3 py-2 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500/20 transition-colors"
+                          >
+                            <FileText className="w-4 h-4" />
+                            Download DOCX
                           </button>
                         </div>
                       </div>
