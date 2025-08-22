@@ -339,19 +339,60 @@ export default function AdminDashboard() {
   };
 
   // Download resume with format conversion
-  const downloadResume = (url: string, filename: string, format: 'pdf' | 'docx' = 'pdf') => {
+  const downloadResume = async (url: string, filename: string, format: 'pdf' | 'docx' = 'pdf', applicantName?: string) => {
     if (url.startsWith('placeholder://')) {
       alert('Resume file storage not configured. Cannot download.');
       return;
     }
 
-    // For now, download the original file
-    // In a production system, you would implement format conversion on the server
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename.includes('.') ? filename : `${filename}.${format}`;
-    link.target = '_blank';
-    link.click();
+    try {
+      const response = await fetch('/api/resume/download', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url,
+          filename,
+          format,
+          applicantName
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Download failed');
+      }
+
+      // Get the blob and create download link
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || `${filename}.${format}`;
+      link.click();
+
+      // Clean up
+      window.URL.revokeObjectURL(downloadUrl);
+
+    } catch (error) {
+      console.error('Download error:', error);
+      alert(`Failed to download resume: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  // Download multiple resumes
+  const downloadMultipleResumes = async (resumes: { url: string; filename: string; applicantName?: string }[]) => {
+    for (const resume of resumes) {
+      try {
+        await downloadResume(resume.url, resume.filename, 'pdf', resume.applicantName);
+        // Add small delay between downloads
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } catch (error) {
+        console.error(`Failed to download ${resume.filename}:`, error);
+      }
+    }
   };
 
   // Password protection screen
