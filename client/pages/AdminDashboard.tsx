@@ -166,15 +166,18 @@ export default function AdminDashboard() {
 
         if (contactsError) {
           console.error("Contacts error:", contactsError);
-          errors.push(`Contacts: ${contactsError.message}`);
+          errors.push(`Contacts table: ${contactsError.message}`);
           setContacts([]);
+          status.contacts = false;
         } else {
           setContacts(contactsData || []);
+          status.contacts = true;
         }
       } catch (err) {
         console.error("Contacts fetch failed:", err);
-        errors.push(`Contacts: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        errors.push(`Contacts table: ${err instanceof Error ? err.message : 'Unknown error'}`);
         setContacts([]);
+        status.contacts = false;
       }
 
       // Fetch get started requests with detailed error handling
@@ -186,14 +189,16 @@ export default function AdminDashboard() {
 
         if (getStartedError) {
           console.warn("Get started requests error:", getStartedError);
-          // Don't add to errors array for optional tables
           setGetStartedRequests([]);
+          status.getStarted = false;
         } else {
           setGetStartedRequests(getStartedData || []);
+          status.getStarted = true;
         }
       } catch (err) {
         console.warn("Get started requests fetch failed:", err);
         setGetStartedRequests([]);
+        status.getStarted = false;
       }
 
       // Fetch resume uploads with detailed error handling
@@ -222,8 +227,10 @@ export default function AdminDashboard() {
             created_at: app.created_at,
           })) || [];
           setResumeUploads(combinedResumeData);
+          status.resumes = false;
         } else {
           setResumeUploads(resumeUploadsData || []);
+          status.resumes = true;
         }
       } catch (err) {
         console.warn("Resume uploads fetch failed:", err);
@@ -244,13 +251,12 @@ export default function AdminDashboard() {
           created_at: app.created_at,
         })) || [];
         setResumeUploads(combinedResumeData);
+        status.resumes = false;
       }
 
-      // Show errors if any critical tables failed
-      if (errors.length > 0) {
-        console.error("Database errors detected:", errors);
-        alert(`Database setup needed:\n\n${errors.join('\n')}\n\nPlease run the database migration script in your Supabase project.`);
-      }
+      // Update database status
+      status.errors = errors;
+      setDbStatus(status);
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
