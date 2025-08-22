@@ -44,10 +44,12 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/get-started" element={<GetStarted />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/secure-admin-forms" element={<SecureAdminForms />} />
             <Route path="/SecureAdminForms" element={<SecureAdminForms />} />
             <Route path="/resume-downloads" element={<ResumeDownloads />} />
+            <Route path="/database-test" element={<DatabaseTest />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/cookie-policy" element={<CookiePolicy />} />
