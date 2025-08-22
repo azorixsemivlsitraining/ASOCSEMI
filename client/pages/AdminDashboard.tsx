@@ -13,6 +13,8 @@ import {
   Lock,
   FileSpreadsheet,
   Archive,
+  Database,
+  RefreshCw,
 } from "lucide-react";
 import Header from "../components/Header";
 import { useAuth } from "../contexts/AuthContext";
