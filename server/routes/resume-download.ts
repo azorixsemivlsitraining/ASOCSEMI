@@ -112,13 +112,13 @@ export const handleBatchResumeDownload: RequestHandler = async (req, res) => {
             };
           }
 
-          const response = await fetch(resume.url, { method: 'HEAD' });
-          
+          const fileInfo = await checkFileAvailability(resume.url);
+
           return {
             filename: resume.filename,
-            status: response.ok ? 'available' : 'not_found',
-            size: response.headers.get('content-length'),
-            contentType: response.headers.get('content-type')
+            status: fileInfo.available ? 'available' : 'not_found',
+            size: fileInfo.size?.toString(),
+            contentType: fileInfo.contentType
           };
         } catch (error) {
           return {
