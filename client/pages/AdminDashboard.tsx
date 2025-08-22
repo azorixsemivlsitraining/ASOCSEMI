@@ -125,6 +125,13 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       const errors: string[] = [];
+      const status = {
+        applications: false,
+        contacts: false,
+        getStarted: false,
+        resumes: false,
+        errors: [] as string[]
+      };
 
       // Fetch applications with detailed error handling
       let applicationsData: Application[] = [];
@@ -136,15 +143,18 @@ export default function AdminDashboard() {
 
         if (appsError) {
           console.error("Job applications error:", appsError);
-          errors.push(`Job applications: ${appsError.message}`);
+          errors.push(`Job applications table: ${appsError.message}`);
+          status.applications = false;
         } else {
           applicationsData = data || [];
           setApplications(applicationsData);
+          status.applications = true;
         }
       } catch (err) {
         console.error("Job applications fetch failed:", err);
-        errors.push(`Job applications: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        errors.push(`Job applications table: ${err instanceof Error ? err.message : 'Unknown error'}`);
         setApplications([]);
+        status.applications = false;
       }
 
       // Fetch contacts with detailed error handling
