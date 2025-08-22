@@ -117,9 +117,37 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchData();
+      testDatabaseConnection();
     }
   }, [isAuthenticated]);
+
+  const testDatabaseConnection = async () => {
+    try {
+      // Simple connectivity test
+      const { error } = await supabase.from('_').select('*').limit(1);
+      if (error && error.code === 'PGRST116') {
+        // This is expected - table doesn't exist, but connection works
+        console.log('Database connection successful');
+        fetchData();
+      } else if (error) {
+        console.error('Database connection failed:', error);
+        setDbStatus(prev => ({
+          ...prev,
+          errors: [`Database connection failed: ${error.message}`]
+        }));
+        setLoading(false);
+      } else {
+        fetchData();
+      }
+    } catch (error) {
+      console.error('Database connection test failed:', error);
+      setDbStatus(prev => ({
+        ...prev,
+        errors: [`Connection test failed: ${error instanceof Error ? error.message : 'Unknown error'}`]
+      }));
+      setLoading(false);
+    }
+  };
 
   const fetchData = async () => {
     try {
