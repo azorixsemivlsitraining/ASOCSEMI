@@ -233,26 +233,20 @@ export const handleResumeMetadata: RequestHandler = async (req, res) => {
       });
     }
 
-    const response = await fetch(url, { method: 'HEAD' });
-    
-    if (!response.ok) {
+    const fileInfo = await checkFileAvailability(url);
+
+    if (!fileInfo.available) {
       return res.json({
         available: false,
-        error: 'File not found',
-        status: response.status
+        error: 'File not found'
       });
     }
 
-    const contentType = response.headers.get('content-type');
-    const contentLength = response.headers.get('content-length');
-    const lastModified = response.headers.get('last-modified');
-
     res.json({
       available: true,
-      contentType,
-      size: contentLength ? parseInt(contentLength) : null,
-      lastModified,
-      extension: getFileExtension(url, contentType || ''),
+      contentType: fileInfo.contentType,
+      size: fileInfo.size,
+      extension: getFileExtension(url, fileInfo.contentType || ''),
       supportsConversion: {
         pdf: true,
         docx: true // Note: Actual conversion not implemented
