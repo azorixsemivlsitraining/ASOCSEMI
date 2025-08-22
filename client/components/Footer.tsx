@@ -16,9 +16,10 @@ export default function Footer() {
 
   const companyLinks = [
     { name: "About Us", href: "/about" },
-    { name: "Our Team", href: "#" },
+
     { name: "Careers", href: "/careers" },
     { name: "Blog", href: "#" },
+    { name: "Contact Support", href: "/contact" },
     { name: "System", href: "/admin-dashboard" },
   ];
 
@@ -27,15 +28,7 @@ export default function Footer() {
       title: "Company",
       links: companyLinks,
     },
-    {
-      title: "Support",
-      links: [
-        { name: "Documentation", href: "#" },
-        { name: "Help Center", href: "#" },
-        { name: "Contact Support", href: "/contact" },
-        { name: "Community", href: "#" },
-      ],
-    },
+
     {
       title: "Legal",
       links: [
@@ -74,8 +67,8 @@ export default function Footer() {
             <div>
               <div className="mb-6">
                 <img
-                  src="https://cdn.builder.io/api/v1/image/assets%2F9cb17e967f804ce2b909c6bc3232a9f0%2F8ee6d0821d4340c299bf526d740adcab?format=webp&width=200"
-                  alt="ASOCSEMI Logo"
+                  src="https://cdn.builder.io/api/v1/image/assets%2F5c07bd532d434c36b4bb2918deeee627%2Fe656648968d84393a26405208e9b2be2?format=webp&width=2000"
+                  alt="ASCOSEMI Logo"
                   className="h-20 sm:h-24 lg:h-28 w-auto"
                 />
               </div>
@@ -96,10 +89,11 @@ export default function Footer() {
                   <span> +91 40-71553446</span>
                 </div>
                 <div className="flex items-center gap-3 text-muted-foreground">
-                  <MapPin className="w-4 h-4 text-tech-blue" />
+                  <MapPin className="w-4 h-[29px] text-tech-blue" />
                   <span>
-                    WeWork Rajapushpa Summit Rajapushpa Summit, Financial
-                    District, Hyderabad, Telangana 500032.
+                    ANANTHA SOFTWARE SOLUTIONS Pvt. Ltd., WeWork Rajapushpa
+                    Summit Rajapushpa Summit, Financial District, Hyderabad,
+                    Telangana 500032.
                   </span>
                 </div>
               </div>

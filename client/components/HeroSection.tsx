@@ -120,20 +120,7 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <button
-        onClick={() => {
-          window.scrollTo({
-            top: window.innerHeight,
-            behavior: "smooth",
-          });
-        }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 group cursor-pointer"
-      >
-        <div className="w-6 h-10 border-2 border-foreground/30 group-hover:border-tech-blue rounded-full flex justify-center transition-colors duration-200">
-          <div className="w-1 h-3 bg-tech-blue rounded-full mt-2 animate-bounce"></div>
-        </div>
-      </button>
+   
     </section>
   );
 }

@@ -35,6 +35,7 @@ export default function Header() {
     { name: "Vision", href: "/vision" },
     { name: "About us", href: "/about" },
     { name: "Careers", href: "/careers" },
+    { name: "Blogs", href: "/blogs" },
     { name: "Contact", href: "/contact" },
   ];
 
@@ -51,8 +52,8 @@ export default function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <img
-              src="https://cdn.builder.io/api/v1/image/assets%2F9cb17e967f804ce2b909c6bc3232a9f0%2F8ee6d0821d4340c299bf526d740adcab?format=webp&width=200"
-              alt="ASOCSEMI Logo"
+              src="https://cdn.builder.io/api/v1/image/assets%2F5c07bd532d434c36b4bb2918deeee627%2Fe656648968d84393a26405208e9b2be2?format=webp&width=2000"
+              alt="ASCOSEMI Logo"
               className="h-20 sm:h-24 lg:h-28 w-auto"
             />
           </div>
@@ -72,6 +73,14 @@ export default function Header() {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
+            {!user && (
+              <Link
+                to="/login"
+                className="px-4 py-2 text-sm font-medium text-foreground/80 hover:text-tech-blue transition-colors duration-200"
+              >
+                Admin Login
+              </Link>
+            )}
             {user ? (
               <div className="relative">
                 <button
@@ -134,6 +143,15 @@ export default function Header() {
                   {link.name}
                 </Link>
               ))}
+              {!user && (
+                <Link
+                  to="/login"
+                  className="text-foreground/80 hover:text-tech-blue transition-colors duration-200 py-2 font-medium"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Admin Login
+                </Link>
+              )}
               {user ? (
                 <>
                   <div className="py-2 text-foreground/80 border-t border-border-subtle">
