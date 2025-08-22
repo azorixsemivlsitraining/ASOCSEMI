@@ -145,6 +145,53 @@ export const handleBatchResumeDownload: RequestHandler = async (req, res) => {
   }
 };
 
+// Helper function to download file from URL
+function downloadFile(url: string): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const client = url.startsWith('https') ? https : http;
+
+    client.get(url, (response) => {
+      if (response.statusCode !== 200) {
+        reject(new Error(`Failed to download file: HTTP ${response.statusCode}`));
+        return;
+      }
+
+      const chunks: Buffer[] = [];
+
+      response.on('data', (chunk) => {
+        chunks.push(chunk);
+      });
+
+      response.on('end', () => {
+        resolve(Buffer.concat(chunks));
+      });
+    }).on('error', (error) => {
+      reject(error);
+    });
+  });
+}
+
+// Helper function to check file availability
+function checkFileAvailability(url: string): Promise<{ available: boolean; contentType?: string; size?: number }> {
+  return new Promise((resolve) => {
+    const client = url.startsWith('https') ? https : http;
+
+    const req = client.request(url, { method: 'HEAD' }, (response) => {
+      resolve({
+        available: response.statusCode === 200,
+        contentType: response.headers['content-type'],
+        size: response.headers['content-length'] ? parseInt(response.headers['content-length'] as string) : undefined
+      });
+    });
+
+    req.on('error', () => {
+      resolve({ available: false });
+    });
+
+    req.end();
+  });
+}
+
 // Helper function to determine file extension
 function getFileExtension(url: string, contentType: string): string {
   // Try to get extension from URL
