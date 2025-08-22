@@ -27,16 +27,8 @@ export const handleResumeDownload: RequestHandler = async (req, res) => {
     }
 
     // Fetch the original file
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      return res.status(404).json({ 
-        error: 'Resume file not found' 
-      });
-    }
-
-    const buffer = await response.buffer();
-    const contentType = response.headers.get('content-type') || 'application/octet-stream';
+    const buffer = await downloadFile(url);
+    const contentType = 'application/octet-stream'; // Default content type
 
     // Determine the original file extension
     const originalExtension = getFileExtension(url, contentType);
