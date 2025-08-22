@@ -98,7 +98,7 @@ export default function Services() {
     },
     {
       icon: <Globe className="w-12 h-12" />,
-      title: "RLT design",
+      title: "RTL design",
       description:
         "End-to-end design services from specifications to GDS.",
       features: [
