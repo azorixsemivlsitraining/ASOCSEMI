@@ -553,9 +553,9 @@ export default function AdminDashboard() {
                   onClick={exportAllToExcel}
                   className="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 flex items-center gap-2"
                   disabled={
-                    filteredApplications.length === 0 && 
-                    filteredContacts.length === 0 && 
-                    filteredGetStartedRequests.length === 0 && 
+                    filteredApplications.length === 0 &&
+                    filteredContacts.length === 0 &&
+                    filteredGetStartedRequests.length === 0 &&
                     filteredResumeUploads.length === 0
                   }
                 >
@@ -564,6 +564,54 @@ export default function AdminDashboard() {
                 </button>
               </div>
             </div>
+
+            {/* Database Status Indicator */}
+            {dbStatus.errors.length > 0 && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-6">
+                <div className="flex items-start gap-4">
+                  <div className="bg-yellow-100 p-2 rounded-lg">
+                    <ExternalLink className="w-5 h-5 text-yellow-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-yellow-800 mb-2">
+                      Database Setup Required
+                    </h3>
+                    <p className="text-yellow-700 mb-4">
+                      Some database tables are missing. Please run the database migration to set up all required tables.
+                    </p>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                      <div className={`flex items-center gap-2 ${dbStatus.applications ? 'text-green-600' : 'text-red-600'}`}>
+                        <div className={`w-3 h-3 rounded-full ${dbStatus.applications ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                        <span className="text-sm font-medium">Job Applications</span>
+                      </div>
+                      <div className={`flex items-center gap-2 ${dbStatus.contacts ? 'text-green-600' : 'text-red-600'}`}>
+                        <div className={`w-3 h-3 rounded-full ${dbStatus.contacts ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                        <span className="text-sm font-medium">Contacts</span>
+                      </div>
+                      <div className={`flex items-center gap-2 ${dbStatus.getStarted ? 'text-green-600' : 'text-yellow-600'}`}>
+                        <div className={`w-3 h-3 rounded-full ${dbStatus.getStarted ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+                        <span className="text-sm font-medium">Get Started</span>
+                      </div>
+                      <div className={`flex items-center gap-2 ${dbStatus.resumes ? 'text-green-600' : 'text-yellow-600'}`}>
+                        <div className={`w-3 h-3 rounded-full ${dbStatus.resumes ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+                        <span className="text-sm font-medium">Resume Uploads</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-yellow-100 border border-yellow-200 rounded-lg p-4">
+                      <h4 className="font-semibold text-yellow-800 mb-2">Setup Instructions:</h4>
+                      <ol className="text-sm text-yellow-700 space-y-1">
+                        <li>1. Go to your <a href="https://supabase.com/dashboard/project/jrjwiamibemyxubqudgg" target="_blank" rel="noopener noreferrer" className="underline font-medium">Supabase Dashboard</a></li>
+                        <li>2. Navigate to SQL Editor</li>
+                        <li>3. Run the database-migration.sql script</li>
+                        <li>4. Refresh this page to verify setup</li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Stats Cards */}
