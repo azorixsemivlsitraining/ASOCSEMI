@@ -87,6 +87,19 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState("");
   const [selectedItem, setSelectedItem] = useState<Application | Contact | GetStartedRequest | ResumeUpload | null>(null);
   const [modalType, setModalType] = useState<"application" | "contact" | "get-started" | "resume" | null>(null);
+  const [dbStatus, setDbStatus] = useState<{
+    applications: boolean;
+    contacts: boolean;
+    getStarted: boolean;
+    resumes: boolean;
+    errors: string[];
+  }>({
+    applications: false,
+    contacts: false,
+    getStarted: false,
+    resumes: false,
+    errors: []
+  });
 
   const ADMIN_PASSWORD = "admin2024";
 
