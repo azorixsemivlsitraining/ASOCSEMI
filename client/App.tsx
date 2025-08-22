@@ -23,6 +23,7 @@ import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
 import SecureAdminForms from "./pages/SecureAdminForms";
 import ResumeDownloads from "./pages/ResumeDownloads";
+import DatabaseTest from "./pages/DatabaseTest";
 
 const queryClient = new QueryClient();
 
